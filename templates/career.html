@@ -6,6 +6,15 @@
     <!-- Step 2 -->
     <h1><center>You searched for {{ career }}</center></h1>
 
+    <br>
+    <h2>Here are some ranked job listings</h2>
+    {% for listing, strength, job_title in suggestions %}
+        <p> We suggest <a href="http://www.indeed.com/{{ listing }}">{{ job_title }}</a> with strength <b>{{ strength }}</b></p>
+    {% endfor %}
+
+    <br>
+    <h2>Learn these {{ career }} skills:</h2>
+    <p> Shit aint coded yet yo </p>
 
 </div>
 

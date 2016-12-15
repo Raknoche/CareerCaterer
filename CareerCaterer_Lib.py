@@ -55,3 +55,34 @@ def SuggestCareers(doc):
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
 
     return sims, job_list
+
+
+def SuggestJobListings(doc,career):
+
+    career=career.lower().replace(' ','+')
+    con = mdb.connect('localhost', 'raknoche', 'localpswd', 'indeed_database');
+
+    with con:
+        cur = con.cursor(mdb.cursors.DictCursor)
+        query = "SELECT JobSkills,UniqueUrl,JobTitle FROM JobListings WHERE JobSearched = %s"
+        cur.execute(query,career)
+
+        rows = cur.fetchall()
+
+        all_docs = [ast.literal_eval(row['JobSkills'].lower()) for row in rows]
+        all_titles = [row['JobTitle'] for row in rows]
+        all_urls = [row['UniqueUrl'] for row in rows]
+
+    dictionary = corpora.Dictionary(all_docs)
+    corpus = [dictionary.doc2bow(doc) for doc in all_docs]
+    tfidf = models.TfidfModel(corpus)
+    corpus_tfidf = tfidf[corpus]
+    index = similarities.MatrixSimilarity(tfidf[corpus])
+    doc = 'python programming python'
+    vec_bow = dictionary.doc2bow(doc.lower().split(' '))
+    vec_tfidf = tfidf[vec_bow] 
+    sims = index[vec_tfidf] 
+    sims = sorted(enumerate(sims), key=lambda item: -item[1])
+
+    return sims, all_urls, all_titles
+

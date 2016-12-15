@@ -2,7 +2,7 @@ from flask import Flask, redirect, render_template, request, url_for, jsonify
 import wtforms as wt
 from wtforms import TextField, Form
 import pymysql as mdb
-from CareerCaterer_Lib import SuggestCareers
+from CareerCaterer_Lib import SuggestCareers, SuggestJobListings
 
 
 app = Flask(__name__)
@@ -80,15 +80,6 @@ def autocomplete_careers():
     app.logger.debug(search_career)
     return jsonify(json_list=dbcareers) 
 
-#Webpage for specific career search
-@app.route('/search_for_career',methods=['GET','POST'])
-def search_for_career():
-	searched_career = request.form['autocomplete_careers']
-	if searched_career in dbcareers:
-		return render_template("career.html", career=searched_career)
-	else:
-		#Put in a flash saying the job isn't in our DB, for now
-		return redirect(url_for('Step2'))
 
 #Webpage for suggesting careers
 @app.route('/suggested_career',methods=['GET'])
@@ -99,10 +90,52 @@ def suggested_career():
 	suggested_careers=[job_list[sim[0]].replace('+',' ').title() for sim in sims]
 	suggestion_strength=[sim[1] for sim in sims]
 
+	max_careers = 5
+	suggested_careers=suggested_careers[:max_careers]
+	suggestion_strength=suggestion_strength[:max_careers]
+
 	#Pass the to the html page
 	return render_template("suggested_careers.html", suggestions=zip(suggested_careers,suggestion_strength))
 
 '''Individual Career Page Code'''
+
+#Webpage for specific career search
+@app.route('/search_for_career',methods=['GET','POST'])
+def search_for_career():
+	searched_career = request.form['autocomplete_careers']
+	if searched_career in dbcareers:
+		sims, all_urls, all_titles = SuggestJobListings(user_skills,searched_career)
+		suggested_listings = [all_urls[item[0]] for item in sims]
+		listing_strength = [item[1] for item in sims]
+		job_titles = [all_titles[item[0]] for item in sims]
+
+		max_listings=5
+		suggested_listings=suggested_listings[:max_listings]
+		listing_strength=listing_strength[:max_listings]
+		job_titles=job_titles[:max_listings]
+
+		return render_template("career.html", career=searched_career, suggestions=zip(suggested_listings,listing_strength,job_titles))
+	else:
+		#Put in a flash saying the job isn't in our DB, for now
+		return redirect(url_for('Step2'))
+
+#Webpage for specific career search
+@app.route('/search_suggested_career',methods=['GET','POST'])
+def search_suggested_career():
+	searched_career = request.form['selected_suggestion']
+	
+	sims, all_urls, all_titles = SuggestJobListings(user_skills,searched_career)
+	suggested_listings = [all_urls[item[0]] for item in sims]
+	listing_strength = [item[1] for item in sims]
+	job_titles = [all_titles[item[0]] for item in sims]
+
+	max_listings=5
+	suggested_listings=suggested_listings[:max_listings]
+	listing_strength=listing_strength[:max_listings]
+	job_titles=job_titles[:max_listings]
+	
+	return render_template("career.html", career=searched_career, suggestions=zip(suggested_listings,listing_strength,job_titles))
+
 
 if __name__ == "__main__":
     app.run()
