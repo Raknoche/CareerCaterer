@@ -1,0 +1,102 @@
+<html>
+<head>
+    <title>Career Caterer</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- JQuery and JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <link href="//code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet"></link>
+    <script src="//code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script src="//code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+
+    <script>
+    $(function() {
+        $.ajax({
+            url: '{{ url_for("autocomplete") }}'
+            }).done(function (data) {
+                $('#autocomplete').autocomplete({
+                    source: data.json_list,
+                    minLength: 2
+                });
+            });
+        });
+    </script>
+
+    <!-- Use for editing default Bootstap -->
+    <style>
+    .jumbotron{
+        background-color: #eee;
+    }
+    </style>
+
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Career Caterer</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Step 1 -->
+        <h1><center>Step 1: Enter your skills</center></h1>
+
+        <!-- skill inputs -->
+        <div class="row">
+        <div class="col-lg-8 col-lg-offset-2">
+        <center>
+            <form action="{{ url_for('add_user_skill') }}" method="POST">
+                <label for="typeahead">Enter your skills (one by one):</label>
+                <div class="input-group input-group-lg">
+                    <input name="autocomplete" type="text" id="autocomplete" class="form-control input-lg"/>
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-primary" role="button">Submit</button>
+                    </span>
+                </div>
+            </form>
+        </center>
+        </div>
+        </div>
+
+        <!-- Display Skills -->
+        <div class="row">
+        <div class="col-lg-8 col-lg-offset-2">
+        <center>
+            <div class="jumbotron">
+                    <p>Your skills</p>
+                    {% for skill in skillList %}
+                        <form action="{{ url_for('remove_user_skill') }}" method=post>
+                            <div class="input-group">
+                                {{ skill }}
+                                <input type=hidden value="{{ skill }}" name="skill_to_remove"></input>
+                                <button type=submit class="btn btn-xs"><span class="glyphicon glyphicon-remove"></span></button>
+                            </div>
+                        </form>
+                    {% endfor %}
+            </div>
+        </center>
+        </div>
+        </div>
+
+
+
+    </div>
+
+
+</body>
+</html>
