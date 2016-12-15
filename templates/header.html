@@ -14,12 +14,28 @@
     <script src="//code.jquery.com/jquery-2.2.0.min.js"></script>
     <script src="//code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
 
+    <!-- Autocomplete for skill search -->
     <script>
     $(function() {
         $.ajax({
             url: '{{ url_for("autocomplete") }}'
             }).done(function (data) {
                 $('#autocomplete').autocomplete({
+                    source: data.json_list,
+                    minLength: 2
+                });
+            });
+        });
+    </script>
+
+
+    <!-- Autocomplete for skill search -->
+    <script>
+    $(function() {
+        $.ajax({
+            url: '{{ url_for("autocomplete_careers") }}'
+            }).done(function (data) {
+                $('#autocomplete_careers').autocomplete({
                     source: data.json_list,
                     minLength: 2
                 });
@@ -52,59 +68,10 @@
         </div>
     </nav>
 
-    <div class="container">
-        <!-- Step 1 -->
-        <h1><center>Step 1: Enter your skills</center></h1>
+{% block content %}
 
-        <!-- skill inputs -->
-        <div class="row">
-        <div class="col-lg-8 col-lg-offset-2">
-        <center>
-            <form action="{{ url_for('add_user_skill') }}" method="POST">
-                <label for="typeahead">Enter your skills (one by one):</label>
-                <div class="input-group input-group-lg">
-                    <input name="autocomplete" type="text" id="autocomplete" class="form-control input-lg"/>
-                    <span class="input-group-btn">
-                        <button type="submit" class="btn btn-primary" role="button">Submit</button>
-                    </span>
-                </div>
-            </form>
-        </center>
-        </div>
-        </div>
-
-        <!-- Display Skills -->
-        <div class="row">
-        <div class="col-lg-8 col-lg-offset-2">
-        <center>
-            <div class="jumbotron">
-                    <p>Your skills</p>
-                    {% for skill in skillList %}
-                        <form action="{{ url_for('remove_user_skill') }}" method=post>
-                            <div class="input-group">
-                                {{ skill }}
-                                <input type=hidden value="{{ skill }}" name="skill_to_remove"></input>
-                                <button type=submit class="btn btn-xs"><span class="glyphicon glyphicon-remove"></span></button>
-                            </div>
-                        </form>
-                    {% endfor %}
-            </div>
-        </center>
-        </div>
-        </div>
-
-        <!-- Next Page -->
-        <div class="row">
-        <div class="col-lg-8 col-lg-offset-2">
-        <center>
-            <h3>If the list above looks good, move on to <a href="{{ url_for('Step2')}}">Step 2</a></h3>
-        </center>
-        </div>
-        </div>
-
-
-    </div>
-
+{% endblock %}
 
 </body>
+
 </html>

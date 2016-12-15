@@ -2,6 +2,8 @@ from flask import Flask, redirect, render_template, request, url_for, jsonify
 import wtforms as wt
 from wtforms import TextField, Form
 import pymysql as mdb
+from CareerCaterer_Lib import SuggestCareers
+
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -9,25 +11,35 @@ app.config["DEBUG"] = True
 #List of user's skills
 user_skills = []
 
-#List of skills in our DB, for autocompletion
+#List of skills and jobs in our DB, for autocompletion
 con = mdb.connect('localhost', 'raknoche', 'localpswd', 'indeed_database',charset='utf8');
                 
 with con:
     cur = con.cursor()
     cur.execute("SELECT JobSkill FROM JobSkills;")
     all_skills= cur.fetchall()
+
+    cur = con.cursor()
+    cur.execute("SELECT DISTINCT(JobSearched) from JobListings;")
+    all_jobs= cur.fetchall()   
     
 dbskills = [skill[0] for skill in all_skills]
+dbcareers = [job[0].replace('+',' ').title() for job in all_jobs]
+
 del all_skills
+del all_jobs
+
 
 class SearchForm(Form):
     autocomp= TextField('autocomp',id='autocomplete')
 
+
+'''Home Page Code'''
 #Home page
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "GET":
-        return render_template("main_page.html", skillList=user_skills)
+        return render_template("step_one.html", skillList=user_skills)
 
     return redirect(url_for('index'))
 
@@ -54,6 +66,43 @@ def autocomplete():
     return jsonify(json_list=dbskills) 
 
 
+'''Career Search (Step two) CODE'''
+#Webpage for step two
+@app.route('/step2',methods=['GET'])
+def Step2():
+    return render_template("step_two.html", skillList=user_skills)
+
+
+#Handles autocompleting the career search bar
+@app.route('/autocomplete_careers',methods=['GET'])
+def autocomplete_careers():
+    search_career = request.args.get('term')
+    app.logger.debug(search_career)
+    return jsonify(json_list=dbcareers) 
+
+#Webpage for specific career search
+@app.route('/search_for_career',methods=['GET','POST'])
+def search_for_career():
+	searched_career = request.form['autocomplete_careers']
+	if searched_career in dbcareers:
+		return render_template("career.html", career=searched_career)
+	else:
+		#Put in a flash saying the job isn't in our DB, for now
+		return redirect(url_for('Step2'))
+
+#Webpage for suggesting careers
+@app.route('/suggested_career',methods=['GET'])
+def suggested_career():
+	#Calculate the skills we want to suggest first
+	#SuggestCareers handles making everything lowercase
+	sims, job_list = SuggestCareers(user_skills)
+	suggested_careers=[job_list[sim[0]].replace('+',' ').title() for sim in sims]
+	suggestion_strength=[sim[1] for sim in sims]
+
+	#Pass the to the html page
+	return render_template("suggested_careers.html", suggestions=zip(suggested_careers,suggestion_strength))
+
+'''Individual Career Page Code'''
 
 if __name__ == "__main__":
     app.run()
