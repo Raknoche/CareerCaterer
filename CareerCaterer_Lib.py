@@ -78,8 +78,7 @@ def SuggestJobListings(doc,career):
     tfidf = models.TfidfModel(corpus)
     corpus_tfidf = tfidf[corpus]
     index = similarities.MatrixSimilarity(tfidf[corpus])
-    doc = 'python programming python'
-    vec_bow = dictionary.doc2bow(doc.lower().split(' '))
+    vec_bow = dictionary.doc2bow(doc)
     vec_tfidf = tfidf[vec_bow] 
     sims = index[vec_tfidf] 
     sims = sorted(enumerate(sims), key=lambda item: -item[1])
