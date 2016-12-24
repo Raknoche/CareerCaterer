@@ -2,7 +2,7 @@ from flask import Flask, redirect, render_template, request, url_for, jsonify
 import wtforms as wt
 from wtforms import TextField, Form
 import pymysql as mdb
-from CareerCaterer_Lib import SuggestCareers, SuggestJobListings
+from CareerCaterer_Lib import SuggestCareers, SuggestJobListings, SuggestJobSkills
 
 
 app = Flask(__name__)
@@ -61,7 +61,7 @@ def remove_user_skill():
 #Handles autocompleting the skill's search bar
 @app.route('/autocomplete',methods=['GET'])
 def autocomplete():
-    search = request.args.get('term')
+    search = request.args.get('term') #Not sure this is needed...
     app.logger.debug(search)
     return jsonify(json_list=dbskills) 
 
@@ -102,39 +102,43 @@ def suggested_career():
 #Webpage for specific career search
 @app.route('/search_for_career',methods=['GET','POST'])
 def search_for_career():
-	searched_career = request.form['autocomplete_careers']
-	if searched_career in dbcareers:
-		sims, all_urls, all_titles = SuggestJobListings(user_skills,searched_career)
-		suggested_listings = [all_urls[item[0]] for item in sims]
-		listing_strength = [item[1] for item in sims]
-		job_titles = [all_titles[item[0]] for item in sims]
+    searched_career = request.form['autocomplete_careers']
+    if searched_career in dbcareers:
+        sims, all_urls, all_titles = SuggestJobListings(user_skills,searched_career)
+        final_suggestions,final_confidence,final_complexity = SuggestJobSkills(user_skills,searched_career,dbskills)
 
-		max_listings=5
-		suggested_listings=suggested_listings[:max_listings]
-		listing_strength=listing_strength[:max_listings]
-		job_titles=job_titles[:max_listings]
+        suggested_listings = [all_urls[item[0]] for item in sims]
+        listing_strength = [item[1] for item in sims]
+        job_titles = [all_titles[item[0]] for item in sims]
 
-		return render_template("career.html", career=searched_career, suggestions=zip(suggested_listings,listing_strength,job_titles))
-	else:
-		#Put in a flash saying the job isn't in our DB, for now
-		return redirect(url_for('Step2'))
+        max_listings=5
+        suggested_listings=suggested_listings[:max_listings]
+        listing_strength=listing_strength[:max_listings]
+        job_titles=job_titles[:max_listings]
+
+        return render_template("career.html", career=searched_career, skill_suggestions = zip(final_suggestions,final_confidence,final_complexity),suggestions=zip(suggested_listings,listing_strength,job_titles))
+    else:
+        #Put in a flash saying the job isn't in our DB, for now
+        return redirect(url_for('Step2'))
 
 #Webpage for specific career search
 @app.route('/search_suggested_career',methods=['GET','POST'])
 def search_suggested_career():
-	searched_career = request.form['selected_suggestion']
-	
-	sims, all_urls, all_titles = SuggestJobListings(user_skills,searched_career)
-	suggested_listings = [all_urls[item[0]] for item in sims]
-	listing_strength = [item[1] for item in sims]
-	job_titles = [all_titles[item[0]] for item in sims]
+    searched_career = request.form['selected_suggestion']
 
-	max_listings=5
-	suggested_listings=suggested_listings[:max_listings]
-	listing_strength=listing_strength[:max_listings]
-	job_titles=job_titles[:max_listings]
-	
-	return render_template("career.html", career=searched_career, suggestions=zip(suggested_listings,listing_strength,job_titles))
+    sims, all_urls, all_titles = SuggestJobListings(user_skills,searched_career)
+    final_suggestions,final_confidence,final_complexity = SuggestJobSkills(user_skills,searched_career,dbskills)
+
+    suggested_listings = [all_urls[item[0]] for item in sims]
+    listing_strength = [item[1] for item in sims]
+    job_titles = [all_titles[item[0]] for item in sims]
+
+    max_listings=5
+    suggested_listings=suggested_listings[:max_listings]
+    listing_strength=listing_strength[:max_listings]
+    job_titles=job_titles[:max_listings]
+
+    return render_template("career.html", career=searched_career, skill_suggestions = zip(final_suggestions,final_confidence,final_complexity),suggestions=zip(suggested_listings,listing_strength,job_titles))
 
 
 if __name__ == "__main__":

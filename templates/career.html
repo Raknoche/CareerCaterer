@@ -14,7 +14,9 @@
 
     <br>
     <h2>Learn these {{ career }} skills:</h2>
-    <p> Shit aint coded yet yo </p>
+    {% for skill, strength, complexity in skill_suggestions %}
+        <p> We suggest <b>{{ skill }}</b> with strength <b>{{ strength }}</b> based on <b>{{ complexity }}</b> of your skills</p>
+    {% endfor %}
 
 </div>
 
