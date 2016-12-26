@@ -1,3 +1,5 @@
+'''Run this to populate the job kill associations database'''
+
 from bs4 import BeautifulSoup # For HTML parsing
 import urllib # Website connections
 import re # Regular expressions
