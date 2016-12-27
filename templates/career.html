@@ -12,11 +12,13 @@
         <p> We suggest <a href="http://www.indeed.com/{{ listing }}">{{ job_title }}</a> with strength <b>{{ strength }}</b></p>
     {% endfor %}
 
-    <br>
-    <h2>Learn these {{ career }} skills:</h2>
-    {% for skill, strength, complexity in skill_suggestions %}
-        <p> We suggest <b>{{ skill }}</b> with strength <b>{{ strength }}</b> based on <b>{{ complexity }}</b> of your skills</p>
-    {% endfor %}
+    {% if skill_sugg_len > 0 %}
+        <br>
+        <h2>Learn these {{ career }} skills:</h2>
+        {% for skill, strength, complexity in skill_suggestions %}
+            <p> We suggest <b>{{ skill }}</b> with strength <b>{{ strength }}</b> based on <b>{{ complexity }}</b> of your skills</p>
+        {% endfor %}
+    {% endif %}
 
 </div>
 

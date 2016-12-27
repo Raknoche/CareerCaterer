@@ -5,11 +5,29 @@
 <div class="container">
     <!-- Step 1 -->
     <h1><center>Step 1: Enter your skills</center></h1>
+    <br>
+    <br>
+
+    <!-- PDF Upload -->
+    <div class="row">
+        <div class="col-lg-4 col-lg-offset-1 col-md-4 col-md-offset-1 col-sm-5">
+            <h4>Extract skills from your resume or CV:</h4>
+            <form method=post action="{{ url_for('skills_from_pdf') }}" enctype=multipart/form-data>
+                 <input type=file name=file>
+                 <input type=submit value=Upload>
+            </form>
+        </div>
+
+    <!-- or -->
+    <div class="col-lg-2 col-md-2 col-sm-2" style="text-align: center;">
+        <br>
+        <h4>AND/OR</h4>
+        <br>
+    </div>
+
 
     <!-- skill inputs -->
-    <div class="row">
-    <div class="col-lg-8 col-lg-offset-2">
-    <center>
+    <div class="col-lg-4 col-md-4 col-sm-5">
         <form action="{{ url_for('add_user_skill') }}" method="POST">
             <label for="typeahead">Enter your skills (one by one):</label>
             <div class="input-group input-group-lg">
@@ -19,16 +37,19 @@
                 </span>
             </div>
         </form>
-    </center>
     </div>
     </div>
 
+    <br>
+    <br>    
+
     <!-- Display Skills -->
+    {% if skillList | length > 0 %}
     <div class="row">
-    <div class="col-lg-8 col-lg-offset-2">
+    <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
     <center>
+        <h3>Your skills:</h3>
         <div class="jumbotron">
-                <p>Your skills</p>
                 {% for skill in skillList %}
                     <form action="{{ url_for('remove_user_skill') }}" method=post>
                         <div class="input-group">
@@ -47,10 +68,14 @@
     <div class="row">
     <div class="col-lg-8 col-lg-offset-2">
     <center>
-        <h3>If the list above looks good, move on to <a href="{{ url_for('Step2')}}">Step 2</a></h3>
+        <h3>After entering your skills, continue to <a href="{{ url_for('Step2')}}">Step 2</a></h3>
     </center>
     </div>
     </div>
+
+    {% endif %}
+
+
 
 
 </div>

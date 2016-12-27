@@ -4,7 +4,13 @@ import ast
 from gensim import corpora, models, similarities
 import itertools
 import pickle
-
+from pdfminer.pdfparser import PDFParser, PDFDocument
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.converter import PDFPageAggregator
+from pdfminer.layout import LAParams, LTTextBox, LTTextLine
+import pandas as pd
+from functools import reduce
+import re
 
 def UpdateCareerModel():
     ''' Run this to update the tf-idf model used to suggest careers'''
@@ -114,64 +120,95 @@ def SuggestJobSkills(user_skills,career,skills_list):
     '''used to suggest new skills for a user to learn
     This could be sped up if we store the model for each type of job locally
     Not really worth it to store that many models to save 0.4 seconds though'''
-    
+
     #First, remove any skills that aren't in our database
     career=career.lower().replace(' ','+')
     skills_list=[skill.lower() for skill in skills_list]
     user_skills = [skill.lower() for skill in user_skills if (skill.lower() in skills_list)]
-
-    #Make a function that find subsets of our user's skills
-    subsets=set()
-    for length in range(len(user_skills),0,-1):
-        subsets.update(findsubsets(user_skills,length))
-
-    #Find the most complex subsets of our user's skills that we have an association rule
+    
+    number_to_show=5
+    current_num_suggestions=0
     suggested_skills=[]
     suggestion_confidence=[]
+    suggestion_complexity=[]
     used_skills=[]
-
     #Start with the most complex subsets (max of 3)
-    #print(subsets)
-    #Query the lug to see if this skill subset exists in SkillAssociations table
-    con = mdb.connect('localhost', 'raknoche', 'localpswd', 'indeed_database');    
+    for length in range(3,0,-1):
+        subsets = findsubsets(user_skills,length)
+        #print(subsets)
+        #Query the lug to see if this skill subset exists in SkillAssociations table
+        con = mdb.connect('localhost', 'raknoche', 'localpswd', 'indeed_database');    
 
-    with con:
-        cur = con.cursor()
+        with con:
+            cur = con.cursor()
 
-        #Building the query
-        skill_query_txt='('
-        for item in subsets:
-            added_txt = "\"%s\"," % (list(item))
-            skill_query_txt = skill_query_txt + added_txt
+            #Building the query
+            skill_query_txt='('
+            for item in subsets:
+                added_txt = "\"%s\"," % (list(item))
+                skill_query_txt = skill_query_txt + added_txt
 
-        skill_query_txt=skill_query_txt[:-1] + ')'
-        skill_query = "SELECT SuggestedSkill,Confidence,UserSkills FROM SkillAssociations WHERE JobType='%s' and UserSkills IN " % (career) + skill_query_txt;
+            skill_query_txt=skill_query_txt[:-1] + ')'
+            skill_query = "SELECT SuggestedSkill,Confidence,UserSkills FROM SkillAssociations WHERE JobType='%s' and UserSkills IN " % (career)
+            skill_query = skill_query + skill_query_txt
 
-        cur.execute(skill_query)
-        result = cur.fetchall()
+            cur.execute(skill_query)
+            result = cur.fetchall()
 
 
-        for skill in result:
-            suggested_skills.append(skill[0])
-            suggestion_confidence.append(skill[1])
-            used_skills.append(skill[2])
-                        
-        suggestion_complexity= [len(eval(skill)) for skill in used_skills]
-        
+            for skill in result:
+                #Only interested in skills the user doesn't already have
+                if (skill[0] not in user_skills) and (skill[0] not in suggested_skills):
+                    suggested_skills.append(skill[0])
+                    suggestion_confidence.append(skill[1])
+                    suggestion_complexity.append(length)
+                    used_skills.append(skill[2])
+                
+        #break loop once we have enough skill suggestions
+        if len(suggested_skills) > number_to_show:
+            break
+            
     #Order the suggestions by complexity, and then by confidence
-    ordered_suggestions = [skill for (z,y,skill) in sorted(zip(suggestion_complexity,suggestion_confidence,suggested_skills),reverse=True)]
-    ordered_confidence = [suggestion_confidence for (z,suggestion_confidence,skill) in sorted(zip(suggestion_complexity,suggestion_confidence,suggested_skills),reverse=True)]
-    ordered_complexity = [suggestion_complexity for (suggestion_complexity,y,skill) in sorted(zip(suggestion_complexity,suggestion_confidence,suggested_skills),reverse=True)]
-
-    #Remove duplicate suggestions
-    final_confidence=[]
-    final_complexity=[]
-    final_suggestions=[]
-    for idx in range(len(ordered_suggestions)):
-        if (ordered_suggestions[idx].lower() not in user_skills) and (ordered_suggestions[idx] not in final_suggestions):
-            final_confidence.append(ordered_confidence[idx])
-            final_complexity.append(ordered_complexity[idx])
-            final_suggestions.append(ordered_suggestions[idx])
+    final_suggestions = [skill for (z,y,skill) in sorted(zip(suggestion_complexity,suggestion_confidence,suggested_skills),reverse=True)]
+    final_confidence = [suggestion_confidence for (z,suggestion_confidence,y) in sorted(zip(suggestion_complexity,suggestion_confidence,suggested_skills),reverse=True)]
+    final_complexity = [suggestion_complexity for (suggestion_complexity,y,z) in sorted(zip(suggestion_complexity,suggestion_confidence,suggested_skills),reverse=True)]
 
     return (final_suggestions,final_confidence,final_complexity)
+
+#function for grabbing skills from a pdf
+def process_pdf(file_path,values,keys):
+    fp = open(file_path, 'rb')
+    parser = PDFParser(fp)
+    doc = PDFDocument()
+    parser.set_document(doc)
+    doc.set_parser(parser)
+    doc.initialize('')
+    rsrcmgr = PDFResourceManager()
+    laparams = LAParams()
+    device = PDFPageAggregator(rsrcmgr, laparams=laparams)
+    interpreter = PDFPageInterpreter(rsrcmgr, device)
+    all_text=''
+    for page in doc.get_pages():
+        interpreter.process_page(page)
+        layout = device.get_result()
+        for lt_obj in layout:
+            if isinstance(lt_obj, LTTextBox) or isinstance(lt_obj, LTTextLine):
+                all_text=all_text+lt_obj.get_text()
+                
+    skills = []
+    skill_dict = dict(zip(keys, values))
+    repls = ('re-', 're'), ('co-', 'co'), ('non-','non'),('&','and'),(',','')
+
+    formatted_skills = sorted(keys,key=lambda x: len(x),reverse=True)
+    formatted_text = reduce(lambda a, kv: a.replace(*kv), repls, all_text.lower()).replace('-',' ')    
+
+    #Extract skills from processed text
+    common_resume_words=["education","publications","philosophy"]
+    for skill in formatted_skills:
+        if skill not in common_resume_words:
+            if (skill in formatted_text): #sum(1 for _ in re.finditer(r'\b%s\b' % re.escape(skill), formatted_text)) > 0:
+                skills += [skill_dict[skill]] * sum(1 for _ in re.finditer(r'\b%s\b' % re.escape(skill), formatted_text))
+                formatted_text = re.sub(r"\b%s\b" % re.escape(skill), '', formatted_text)
+
+    return skills
 

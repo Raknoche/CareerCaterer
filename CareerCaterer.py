@@ -1,12 +1,31 @@
-from flask import Flask, redirect, render_template, request, url_for, jsonify
+from flask import Flask, flash, redirect, render_template, request, url_for, jsonify
 import wtforms as wt
 from wtforms import TextField, Form
 import pymysql as mdb
-from CareerCaterer_Lib import SuggestCareers, SuggestJobListings, SuggestJobSkills
+from CareerCaterer_Lib import SuggestCareers, SuggestJobListings, SuggestJobSkills, process_pdf
+from werkzeug.utils import secure_filename
+import os
+import random
+import time
+from random import randint
+from pdfminer.pdfparser import PDFParser, PDFDocument
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.converter import PDFPageAggregator
+from pdfminer.layout import LAParams, LTTextBox, LTTextLine
+import pandas as pd
+from functools import reduce
+import re
+random.seed(time.time())
 
+
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+APP_USER_PDFS = os.path.join(APP_ROOT, 'userPDFs')
 
 app = Flask(__name__)
+UPLOAD_FOLDER = '/userPDFs'
+ALLOWED_EXTENSIONS = set(['pdf'])
 app.config["DEBUG"] = True
+app.secret_key = 'super secret key'
 
 #List of user's skills
 user_skills = []
@@ -16,20 +35,21 @@ con = mdb.connect('localhost', 'raknoche', 'localpswd', 'indeed_database',charse
                 
 with con:
     cur = con.cursor()
-    cur.execute("SELECT JobSkill FROM JobSkills;")
+    cur.execute("SELECT JobSkill,FormattedJobSkill FROM JobSkills;")
     all_skills= cur.fetchall()
 
     cur = con.cursor()
     cur.execute("SELECT DISTINCT(JobSearched) from JobListings;")
     all_jobs= cur.fetchall()   
     
-dbskills = [skill[0] for skill in all_skills]
+dbskills = [skill for (skill,formatted_skill) in all_skills]
+dbskills_formatted = [formatted_skill for (skill,formatted_skill) in all_skills]
 dbcareers = [job[0].replace('+',' ').title() for job in all_jobs]
 
 del all_skills
 del all_jobs
 
-
+#Probably note needed?
 class SearchForm(Form):
     autocomp= TextField('autocomp',id='autocomplete')
 
@@ -42,6 +62,51 @@ def index():
         return render_template("step_one.html", skillList=user_skills)
 
     return redirect(url_for('index'))
+
+#Handles getting skills from user PDF
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/skills_from_pdf', methods=['POST'])
+def skills_from_pdf():
+    # check if the post request has the file part
+    if 'file' not in request.files:
+        flash('Please upload a PDF file')
+        return redirect(url_for('index'))
+
+    file = request.files['file']
+
+    if file.filename == '':
+        flash('Please upload a PDF file')
+        return redirect(url_for('index'))
+
+    if file and allowed_file(file.filename):
+        filename = file.filename.rsplit('.', 1)[0].lower() + str(randint(0,100000)) + '.pdf'
+        filename = secure_filename(filename)
+        file_save_path = os.path.join(APP_USER_PDFS, filename)
+        file.save(file_save_path)
+
+        #Get use skills from PDF
+        skills = process_pdf(file_save_path,dbskills,dbskills_formatted)
+
+        #For some reason user_skills += skill doesn't work...
+        for skill in set(skills):
+            if skill not in user_skills:
+                user_skills.append(skill)
+
+        print(user_skills)
+        #Delete user PDF
+        os.remove(file_save_path)
+
+        #Reload homepage
+        return redirect(url_for('index'))
+
+    print("AT END")
+    flash('Please upload a PDF file')
+    return redirect(url_for('index'))
+
 
 #Handles adding skills to user's skill list
 @app.route('/add_user_skill', methods=['POST'])
@@ -116,7 +181,7 @@ def search_for_career():
         listing_strength=listing_strength[:max_listings]
         job_titles=job_titles[:max_listings]
 
-        return render_template("career.html", career=searched_career, skill_suggestions = zip(final_suggestions,final_confidence,final_complexity),suggestions=zip(suggested_listings,listing_strength,job_titles))
+        return render_template("career.html", career=searched_career, skill_suggestions = zip(final_suggestions,final_confidence,final_complexity),skill_sugg_len = len(final_suggestions),suggestions=zip(suggested_listings,listing_strength,job_titles))
     else:
         #Put in a flash saying the job isn't in our DB, for now
         return redirect(url_for('Step2'))
@@ -138,7 +203,7 @@ def search_suggested_career():
     listing_strength=listing_strength[:max_listings]
     job_titles=job_titles[:max_listings]
 
-    return render_template("career.html", career=searched_career, skill_suggestions = zip(final_suggestions,final_confidence,final_complexity),suggestions=zip(suggested_listings,listing_strength,job_titles))
+    return render_template("career.html", career=searched_career, skill_suggestions = zip(final_suggestions,final_confidence,final_complexity),skill_sugg_len = len(final_suggestions),suggestions=zip(suggested_listings,listing_strength,job_titles))
 
 
 if __name__ == "__main__":
