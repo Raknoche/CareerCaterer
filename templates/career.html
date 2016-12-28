@@ -18,6 +18,56 @@
         {% for skill, strength, complexity in skill_suggestions %}
             <p> We suggest <b>{{ skill }}</b> with strength <b>{{ strength }}</b> based on <b>{{ complexity }}</b> of your skills</p>
         {% endfor %}
+
+        <!-- Modal -->
+    <br>
+        <center>
+        <p> If one of our skill suggestions makes no sense, please help us improve by <a href="#" data-toggle="modal" data-target="#RemoveSkillModal">reporting a problematic suggestion</a>.</p>
+        </center>
+    <br>    
+
+    <div class="modal fade" id="RemoveSkillModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <button type="button" class="close" 
+                       data-dismiss="modal">
+                           <span aria-hidden="true">&times;</span>
+                           <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel3">
+                        Did we present a poor skill recommendation?  Help us improve by entering it below:
+                    </h4>
+                </div>
+                
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form" action="{{ url_for('delete_skill_from_db') }}" method=post>
+                      <div class="form-group">
+                        <label  class="col-sm-2 control-label"
+                                  for="UserRecommendedDelete">Enter Problematic Skill:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" 
+                            id="UserRecommendedDelete" placeholder="skill" name="UserRecommendedDelete"/>
+                        </div>
+                      </div>        
+                </div>
+                
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">
+                                Close
+                    </button>
+                    <button type="button" class="btn btn-primary">
+                        Submit
+                    </button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
     {% endif %}
 
 </div>

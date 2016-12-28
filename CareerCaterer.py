@@ -1,4 +1,4 @@
-from flask import Flask, flash, redirect, render_template, request, url_for, jsonify
+from flask import Flask, flash, redirect, render_template, request, url_for, jsonify, session
 import wtforms as wt
 from wtforms import TextField, Form
 import pymysql as mdb
@@ -63,12 +63,14 @@ def index():
 
     return redirect(url_for('index'))
 
+
+
 #Handles getting skills from user PDF
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
+#Handles getting skills from user PDF
 @app.route('/skills_from_pdf', methods=['POST'])
 def skills_from_pdf():
     # check if the post request has the file part
@@ -135,7 +137,7 @@ def autocomplete():
 #Webpage for step two
 @app.route('/step2',methods=['GET'])
 def Step2():
-    return render_template("step_two.html", skillList=user_skills)
+    return render_template("step_two.html")
 
 
 #Handles autocompleting the career search bar
@@ -173,7 +175,7 @@ def search_for_career():
         final_suggestions,final_confidence,final_complexity = SuggestJobSkills(user_skills,searched_career,dbskills)
 
         suggested_listings = [all_urls[item[0]] for item in sims]
-        listing_strength = [item[1] for item in sims]
+        listing_strength = [float(item[1]) for item in sims]
         job_titles = [all_titles[item[0]] for item in sims]
 
         max_listings=5
@@ -181,12 +183,36 @@ def search_for_career():
         listing_strength=listing_strength[:max_listings]
         job_titles=job_titles[:max_listings]
 
-        return render_template("career.html", career=searched_career, skill_suggestions = zip(final_suggestions,final_confidence,final_complexity),skill_sugg_len = len(final_suggestions),suggestions=zip(suggested_listings,listing_strength,job_titles))
+        session['searched_career'] = searched_career
+        session['final_suggestions'] = final_suggestions
+        session['final_confidence'] = final_confidence
+        session['final_complexity'] = final_complexity    
+        session['skill_sugg_len'] = len(final_suggestions)
+        session['suggested_listings'] = suggested_listings
+        session['listing_strength'] = listing_strength
+        session['job_titles'] = job_titles   
+
+        return redirect(url_for('career_page'))
+
     else:
         #Put in a flash saying the job isn't in our DB, for now
         return redirect(url_for('Step2'))
 
 #Webpage for specific career search
+@app.route('/career_page',methods=['GET','POST'])
+def career_page():
+    searched_career = session['searched_career'] 
+    final_suggestions = session['final_suggestions']
+    final_confidence = session['final_confidence']
+    final_complexity = session['final_complexity']
+    skill_sugg_len = session['skill_sugg_len']
+    suggested_listings = session['suggested_listings']
+    listing_strength = session['listing_strength']
+    job_titles = session['job_titles']
+
+    return render_template("career.html", career=searched_career, skill_suggestions = zip(final_suggestions,final_confidence,final_complexity),skill_sugg_len = len(final_suggestions),suggestions=zip(suggested_listings,listing_strength,job_titles))
+
+#Function for getting career suggestions
 @app.route('/search_suggested_career',methods=['GET','POST'])
 def search_suggested_career():
     searched_career = request.form['selected_suggestion']
@@ -195,7 +221,7 @@ def search_suggested_career():
     final_suggestions,final_confidence,final_complexity = SuggestJobSkills(user_skills,searched_career,dbskills)
 
     suggested_listings = [all_urls[item[0]] for item in sims]
-    listing_strength = [item[1] for item in sims]
+    listing_strength = [float(item[1]) for item in sims]
     job_titles = [all_titles[item[0]] for item in sims]
 
     max_listings=5
@@ -203,8 +229,58 @@ def search_suggested_career():
     listing_strength=listing_strength[:max_listings]
     job_titles=job_titles[:max_listings]
 
-    return render_template("career.html", career=searched_career, skill_suggestions = zip(final_suggestions,final_confidence,final_complexity),skill_sugg_len = len(final_suggestions),suggestions=zip(suggested_listings,listing_strength,job_titles))
+    
+    session['searched_career'] = searched_career
+    session['final_suggestions'] = final_suggestions
+    session['final_confidence'] = final_confidence
+    session['final_complexity'] = final_complexity    
+    session['skill_sugg_len'] = len(final_suggestions)
+    session['suggested_listings'] = suggested_listings
+    session['listing_strength'] = listing_strength
+    session['job_titles'] = job_titles    
+    
+    return redirect(url_for('career_page'))
 
+'''Database Management Code'''
+#Letting users suggest skills for us to add
+@app.route("/add_skill_to_db", methods=["GET", "POST"])
+def add_skill_to_db():
+    user_recommended_skill = request.form['UserRecommendedSkill']
+    flash('Thank you for recommending that we add "%s" to our database.' % (user_recommended_skill))
+    #Add skill suggestion to our database -- after protect against sql injection
+    #New table for this -- UserRecommendedSkills with columns Skill, Formatted Skill, and Suggestion Count
+    #Make sure skill is not in current skills database.  If it isn't:
+        #If skill is in the database, add one to suggestion count
+        #If skill isn't in database, add it to database.
+
+    return redirect(url_for('index'))
+
+#Letting users suggest careers for us to add
+@app.route("/add_career_to_db", methods=["GET", "POST"])
+def add_career_to_db():
+    user_recommended_career = request.form['UserRecommendedCareer']
+    flash('Thank you for recommending that we add "%s" to our careers database.' % (user_recommended_career))
+    #Add skill suggestion to our database -- after protect against sql injection
+    #New table for this -- UserRecommendedSkills with columns Skill, Formatted Skill, and Suggestion Count
+    #Make sure skill is not in current skills database.  If it isn't:
+        #If skill is in the database, add one to suggestion count
+        #If skill isn't in database, add it to database.
+
+    return redirect(url_for('Step2'))
+
+#Letting users suggest a skill be removed from our DB
+'''THIS ISN"T WORKING BECAUSE I NEED TO STORE THE VARIABLES IN A SESSION FIRST TO PASS BACK AND FORTH'''
+@app.route("/delete_skill_from_db", methods=["GET", "POST"])
+def delete_skill_from_db():
+    user_recommended_delete = request.form['UserRecommendedDelete']
+    flash('Thank you for reporting "%s" as a problematic suggestion.' % (user_recommended_delete))
+    #Add skill suggestion to our database -- after protect against sql injection
+    #New table for this -- UserRecommendedSkills with columns Skill, Formatted Skill, and Suggestion Count
+    #Make sure skill is not in current skills database.  If it isn't:
+        #If skill is in the database, add one to suggestion count
+        #If skill isn't in database, add it to database.
+
+    return redirect(url_for('career_page'))
 
 if __name__ == "__main__":
     app.run()

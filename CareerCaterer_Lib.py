@@ -133,7 +133,7 @@ def SuggestJobSkills(user_skills,career,skills_list):
     suggestion_complexity=[]
     used_skills=[]
     #Start with the most complex subsets (max of 3)
-    for length in range(3,0,-1):
+    for length in range(min(3,len(user_skills)),0,-1):
         subsets = findsubsets(user_skills,length)
         #print(subsets)
         #Query the lug to see if this skill subset exists in SkillAssociations table

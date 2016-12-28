@@ -40,8 +40,6 @@
     </div>
     </div>
 
-    <br>
-    <br>    
 
     <!-- Display Skills -->
     {% if skillList | length > 0 %}
@@ -75,7 +73,55 @@
 
     {% endif %}
 
+    <!-- Modal -->
+    <br>
+        <center>
+        <p> Is one of your skills missing from our database?  Help us improve by <a href="#" data-toggle="modal" data-target="#AddSkillModal">recommending a skill</a>.</p>
+        </center>
+    <br>    
 
+    <div class="modal fade" id="AddSkillModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <button type="button" class="close" 
+                       data-dismiss="modal">
+                           <span aria-hidden="true">&times;</span>
+                           <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        Are we missing a skill?  Help us improve by entering it below:
+                    </h4>
+                </div>
+                
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form" action="{{ url_for('add_skill_to_db') }}" method=post>
+                      <div class="form-group">
+                        <label  class="col-sm-2 control-label"
+                                  for="UserRecommendedSkill">Enter Skill:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" 
+                            id="UserRecommendedSkill" placeholder="skill" name="UserRecommendedSkill"/>
+                        </div>
+                      </div>        
+                </div>
+                
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">
+                                Close
+                    </button>
+                    <button type="button" class="btn btn-primary">
+                        Submit
+                    </button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 
 </div>
