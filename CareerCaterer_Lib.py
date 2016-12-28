@@ -212,3 +212,82 @@ def process_pdf(file_path,values,keys):
 
     return skills
 
+def format_career(career):
+    return career.replace(' ','+').lower()
+
+def format_skill(skill):
+    repls = ('re-', 're'), ('co-', 'co'), ('non-','non'),('&','and'),(',','')
+    formated_skill = ' '.join([reduce(lambda a, kv: a.replace(*kv), repls,word).replace('-',' ') for word in  skill.lstrip().rstrip().lower().split(' ')])
+    return formated_skill.lstrip().rstrip()
+
+def AddUserSkill(suggestion):
+    formatted_suggestion = format_skill(suggestion)
+
+    con = mdb.connect('localhost', 'raknoche', 'localpswd', 'indeed_database');
+    with con:
+
+        cur = con.cursor()
+        query = "SELECT * FROM UserAddedSkills WHERE FormattedSkill = %s"
+        #If it doesn't exist, add it to database
+        if not cur.execute(query,(formatted_suggestion,)):
+            spelling_dict={suggestion:1}
+            query = "REPLACE INTO UserAddedSkills SET Skill=%s, UserSpelling=%s, FormattedSkill=%s, SuggestionCount=1;"
+            cur.execute(query,(suggestion.lower(),str(spelling_dict),formatted_suggestion))
+
+        #If we already have the entry, adjust it
+        else:
+            result = cur.fetchall()
+            num_suggested = result[0][3] + 1
+            spelling_dict = ast.literal_eval(result[0][1])
+            if suggestion in spelling_dict:
+                spelling_dict[suggestion] += 1
+            else:
+                spelling_dict[suggestion] = 1
+            query = "REPLACE INTO UserAddedSkills SET Skill=%s, UserSpelling=%s, FormattedSkill=%s, SuggestionCount=%s;"
+            cur.execute(query,(suggestion.lower(),str(spelling_dict),formatted_suggestion,num_suggested))
+
+def RemoveUserSkill(suggestion):
+    formatted_suggestion = format_skill(suggestion)
+
+    con = mdb.connect('localhost', 'raknoche', 'localpswd', 'indeed_database');
+    with con:
+
+        cur = con.cursor()
+        query = "SELECT * FROM UserRemovedSkills WHERE FormattedSkill = %s"
+        #If it doesn't exist, add it to database
+        if not cur.execute(query,(formatted_suggestion,)):
+            spelling_dict={suggestion:1}
+            query = "REPLACE INTO UserRemovedSkills SET Skill=%s, UserSpelling=%s, FormattedSkill=%s, SuggestionCount=1;"
+            cur.execute(query,(suggestion.lower(),str(spelling_dict),formatted_suggestion))
+
+        #If we already have the entry, adjust it
+        else:
+            result = cur.fetchall()
+            num_suggested = result[0][3] + 1
+            spelling_dict = ast.literal_eval(result[0][1])
+            if suggestion in spelling_dict:
+                spelling_dict[suggestion] += 1
+            else:
+                spelling_dict[suggestion] = 1
+            query = "REPLACE INTO UserRemovedSkills SET Skill=%s, UserSpelling=%s, FormattedSkill=%s, SuggestionCount=%s;"
+            cur.execute(query,(suggestion.lower(),str(spelling_dict),formatted_suggestion,num_suggested))
+
+def AddUserCareer(career):
+    formatted_career = format_career(career)
+    
+    con = mdb.connect('localhost', 'raknoche', 'localpswd', 'indeed_database');
+    with con:
+
+        cur = con.cursor()
+        query = "SELECT * FROM UserAddedCareers WHERE Career = %s"
+        #If it doesn't exist, add it to database
+        if not cur.execute(query,(formatted_career,)):
+            query = "REPLACE INTO UserAddedCareers SET Career=%s, SuggestionCount=1;"
+            cur.execute(query,(formatted_career,))
+
+        #If we already have the entry, adjust it
+        else:
+            result = cur.fetchall()
+            num_suggested = result[0][1] + 1
+            query = "REPLACE INTO UserAddedCareers SET Career=%s, SuggestionCount=%s;"
+            cur.execute(query,(formatted_career,num_suggested))

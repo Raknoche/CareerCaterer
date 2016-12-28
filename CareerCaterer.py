@@ -3,6 +3,7 @@ import wtforms as wt
 from wtforms import TextField, Form
 import pymysql as mdb
 from CareerCaterer_Lib import SuggestCareers, SuggestJobListings, SuggestJobSkills, process_pdf
+from CareerCaterer_Lib import format_career, format_skill, AddUserSkill, RemoveUserSkill, AddUserCareer
 from werkzeug.utils import secure_filename
 import os
 import random
@@ -247,11 +248,7 @@ def search_suggested_career():
 def add_skill_to_db():
     user_recommended_skill = request.form['UserRecommendedSkill']
     flash('Thank you for recommending that we add "%s" to our database.' % (user_recommended_skill))
-    #Add skill suggestion to our database -- after protect against sql injection
-    #New table for this -- UserRecommendedSkills with columns Skill, Formatted Skill, and Suggestion Count
-    #Make sure skill is not in current skills database.  If it isn't:
-        #If skill is in the database, add one to suggestion count
-        #If skill isn't in database, add it to database.
+    AddUserSkill(user_recommended_skill)
 
     return redirect(url_for('index'))
 
@@ -260,11 +257,7 @@ def add_skill_to_db():
 def add_career_to_db():
     user_recommended_career = request.form['UserRecommendedCareer']
     flash('Thank you for recommending that we add "%s" to our careers database.' % (user_recommended_career))
-    #Add skill suggestion to our database -- after protect against sql injection
-    #New table for this -- UserRecommendedSkills with columns Skill, Formatted Skill, and Suggestion Count
-    #Make sure skill is not in current skills database.  If it isn't:
-        #If skill is in the database, add one to suggestion count
-        #If skill isn't in database, add it to database.
+    AddUserCareer(user_recommended_career)
 
     return redirect(url_for('Step2'))
 
@@ -274,11 +267,7 @@ def add_career_to_db():
 def delete_skill_from_db():
     user_recommended_delete = request.form['UserRecommendedDelete']
     flash('Thank you for reporting "%s" as a problematic suggestion.' % (user_recommended_delete))
-    #Add skill suggestion to our database -- after protect against sql injection
-    #New table for this -- UserRecommendedSkills with columns Skill, Formatted Skill, and Suggestion Count
-    #Make sure skill is not in current skills database.  If it isn't:
-        #If skill is in the database, add one to suggestion count
-        #If skill isn't in database, add it to database.
+    RemoveUserSkill(user_recommended_delete)
 
     return redirect(url_for('career_page'))
 
