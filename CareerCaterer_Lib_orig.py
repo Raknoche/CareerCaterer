@@ -158,20 +158,22 @@ def SuggestJobSkills(user_skills,career,skills_list):
 
             for skill in result:
                 #Only interested in skills the user doesn't already have
-                if (skill[0] not in user_skills):
+                if (skill[0] not in user_skills) and (skill[0] not in suggested_skills):
                     suggested_skills.append(skill[0])
                     suggestion_confidence.append(skill[1])
                     suggestion_complexity.append(length)
                     used_skills.append(skill[2])
                 
+        #break loop once we have enough skill suggestions
+        if len(suggested_skills) > number_to_show:
+            break
             
     #Order the suggestions by complexity, and then by confidence
-    final_suggestions = [skill for (z,y,skill,q) in sorted(zip(suggestion_complexity,suggestion_confidence,suggested_skills,used_skills),reverse=True)]
-    final_confidence = [suggestion_confidence for (z,suggestion_confidence,y,q) in sorted(zip(suggestion_complexity,suggestion_confidence,suggested_skills,used_skills),reverse=True)]
-    final_complexity = [suggestion_complexity for (suggestion_complexity,y,z,q) in sorted(zip(suggestion_complexity,suggestion_confidence,suggested_skills,used_skills),reverse=True)]
-    final_used_skills = [used_skills for (x,y,z,used_skills) in sorted(zip(suggestion_complexity,suggestion_confidence,suggested_skills,used_skills),reverse=True)]
+    final_suggestions = [skill for (z,y,skill) in sorted(zip(suggestion_complexity,suggestion_confidence,suggested_skills),reverse=True)]
+    final_confidence = [suggestion_confidence for (z,suggestion_confidence,y) in sorted(zip(suggestion_complexity,suggestion_confidence,suggested_skills),reverse=True)]
+    final_complexity = [suggestion_complexity for (suggestion_complexity,y,z) in sorted(zip(suggestion_complexity,suggestion_confidence,suggested_skills),reverse=True)]
 
-    return (final_suggestions,final_confidence,final_complexity,final_used_skills)
+    return (final_suggestions,final_confidence,final_complexity)
 
 #function for grabbing skills from a pdf
 def process_pdf(file_path,values,keys):

@@ -17,8 +17,7 @@ import pandas as pd
 from functools import reduce
 import re
 random.seed(time.time())
-import json as JSON
-import ast
+
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 APP_USER_PDFS = os.path.join(APP_ROOT, 'userPDFs')
@@ -31,7 +30,6 @@ app.secret_key = 'super secret key'
 
 #List of user's skills
 user_skills = []
-
 
 #List of skills and jobs in our DB, for autocompletion
 con = mdb.connect('localhost', 'raknoche', 'localpswd', 'indeed_database',charset='utf8');
@@ -65,6 +63,7 @@ def index():
         return render_template("step_one.html", skillList=user_skills)
 
     return redirect(url_for('index'))
+
 
 
 #Handles getting skills from user PDF
@@ -107,6 +106,7 @@ def skills_from_pdf():
         #Reload homepage
         return redirect(url_for('index'))
 
+    print("AT END")
     flash('Please upload a PDF file')
     return redirect(url_for('index'))
 
@@ -173,10 +173,8 @@ def search_for_career():
     searched_career = request.form['autocomplete_careers']
     if searched_career in dbcareers:
         sims, all_urls, all_titles = SuggestJobListings(user_skills,searched_career)
-        final_suggestions,final_confidence,final_complexity,final_used_skills = SuggestJobSkills(user_skills,searched_career,dbskills)
+        final_suggestions,final_confidence,final_complexity = SuggestJobSkills(user_skills,searched_career,dbskills)
 
-        
-        #Bookkeeping
         suggested_listings = [all_urls[item[0]] for item in sims]
         listing_strength = [float(item[1]) for item in sims]
         job_titles = [all_titles[item[0]] for item in sims]
@@ -186,16 +184,14 @@ def search_for_career():
         listing_strength=listing_strength[:max_listings]
         job_titles=job_titles[:max_listings]
 
-        session.clear()
         session['searched_career'] = searched_career
         session['final_suggestions'] = final_suggestions
         session['final_confidence'] = final_confidence
-        session['final_complexity'] = final_complexity   
-        session['final_used_skills'] = final_used_skills 
+        session['final_complexity'] = final_complexity    
         session['skill_sugg_len'] = len(final_suggestions)
         session['suggested_listings'] = suggested_listings
         session['listing_strength'] = listing_strength
-        session['job_titles'] = job_titles
+        session['job_titles'] = job_titles   
 
         return redirect(url_for('career_page'))
 
@@ -210,66 +206,14 @@ def career_page():
     final_suggestions = session['final_suggestions']
     final_confidence = session['final_confidence']
     final_complexity = session['final_complexity']
-    final_used_skills = session['final_used_skills']
     skill_sugg_len = session['skill_sugg_len']
     suggested_listings = session['suggested_listings']
     listing_strength = session['listing_strength']
     job_titles = session['job_titles']
 
-    skill_list=[]
-    assoc_list=[]
-    strength_list=[]
-
-    for (idx,skills) in enumerate(final_used_skills):
-        for skill in  ast.literal_eval(skills):
-            #Check if the skill is already in our user skills dict, if not add it
-            if (skill,final_suggestions[idx]) not in zip(skill_list,assoc_list):
-                skill_list.append(skill)
-                assoc_list.append(final_suggestions[idx])
-                strength_list.append(final_confidence[idx])
-            else:
-                list_idx = list(zip(skill_list,assoc_list)).index((skill,final_suggestions[idx]))
-                strength_list[list_idx] = max(strength_list[list_idx],final_confidence[idx])
-
-    #Get lists of unique association and sum of their confidences
-    df = pd.DataFrame()
-    df['skill']=skill_list
-    df['assoc']=assoc_list
-    df['strength']=strength_list
-
-    assoc_df = df.groupby('assoc').sum().sort('strength',ascending=False)
-    assoc_set = assoc_df.index.tolist()
-    strength_set = assoc_df['strength'].tolist()
-    skill_set = list(set(skill_list))
-
-    #Limit to strong (>1.5) associations only
-    idx_to_drop=[]
-    assoc_to_drop=[]
-    min_assoc=1.5
-    for (idx,conf) in enumerate(strength_set):
-        if conf < min_assoc:
-            idx_to_drop.append(idx)
-            assoc_to_drop.append(assoc_set[idx])
-
-
-    #Remaking lists after removing low confidence results
-    mask = df['assoc'].isin(assoc_to_drop)
-    df = df[~mask]
-    skill_list = df['skill'].tolist()
-    assoc_list = df['assoc'].tolist()
-    strength_list = df['strength'].tolist()
-
-    assoc_df = df.groupby('assoc').sum().sort('strength',ascending=False)
-    assoc_set = assoc_df.index.tolist()
-    strength_set = assoc_df['strength'].tolist()
-    skill_set = list(set(skill_list))
-
-
     return render_template("career.html", career=searched_career, skill_suggestions = zip(final_suggestions,final_confidence,final_complexity),\
-                                skill_sugg_len = len(final_suggestions),suggestions=zip(suggested_listings,listing_strength,job_titles),\
-                                final_suggestions=final_suggestions,final_confidence=final_confidence,final_complexity=final_complexity,\
-                                skill_list=skill_list,assoc_list=assoc_list,strength_list=strength_list,\
-                                skill_set=skill_set,assoc_set=assoc_set,strength_set=strength_set)
+                            skill_sugg_len = len(final_suggestions),suggestions=zip(suggested_listings,listing_strength,job_titles),\
+                            final_suggestions=final_suggestions,final_confidence=final_confidence,final_complexity=final_complexity)
 
 #Function for getting career suggestions
 @app.route('/search_suggested_career',methods=['GET','POST'])
@@ -277,9 +221,8 @@ def search_suggested_career():
     searched_career = request.form['selected_suggestion']
 
     sims, all_urls, all_titles = SuggestJobListings(user_skills,searched_career)
-    final_suggestions,final_confidence,final_complexity,final_used_skills = SuggestJobSkills(user_skills,searched_career,dbskills)
-    
-    #Bookkeeping
+    final_suggestions,final_confidence,final_complexity = SuggestJobSkills(user_skills,searched_career,dbskills)
+
     suggested_listings = [all_urls[item[0]] for item in sims]
     listing_strength = [float(item[1]) for item in sims]
     job_titles = [all_titles[item[0]] for item in sims]
@@ -288,20 +231,17 @@ def search_suggested_career():
     suggested_listings=suggested_listings[:max_listings]
     listing_strength=listing_strength[:max_listings]
     job_titles=job_titles[:max_listings]
+
     
-    session.clear()
     session['searched_career'] = searched_career
     session['final_suggestions'] = final_suggestions
     session['final_confidence'] = final_confidence
-    session['final_complexity'] = final_complexity   
-    session['final_used_skills'] = final_used_skills 
+    session['final_complexity'] = final_complexity    
     session['skill_sugg_len'] = len(final_suggestions)
     session['suggested_listings'] = suggested_listings
     session['listing_strength'] = listing_strength
-    session['job_titles'] = job_titles
-
-    #print(session['final_used_skills'])
-
+    session['job_titles'] = job_titles    
+    
     return redirect(url_for('career_page'))
 
 '''Database Management Code'''
