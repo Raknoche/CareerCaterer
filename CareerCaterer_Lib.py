@@ -12,6 +12,292 @@ import pandas as pd
 from functools import reduce
 import re
 
+from bs4 import BeautifulSoup # For HTML parsing
+import urllib # Website connections
+import re # Regular expressions
+from time import sleep # To prevent overwhelming the server between connections
+from collections import Counter # Keep track of our term counts
+from nltk.corpus import stopwords # Filter out stopwords, such as 'the', 'or', 'and'
+import pandas as pd # For converting results to a dataframe and bar chart plots
+import math
+from string import digits
+from orangecontrib.associate.fpgrowth import *  
+import Orange
+import numpy as np
+from scipy.sparse import lil_matrix
+import pymysql as mdb
+import ast
+from gensim import corpora, models, similarities
+
+import pymysql as mdb
+import sys
+from bs4 import BeautifulSoup # For HTML parsing
+import urllib # Website connections
+import re # Regular expressions
+from time import sleep # To prevent overwhelming the server between connections
+from collections import Counter # Keep track of our term counts
+from nltk.corpus import stopwords # Filter out stopwords, such as 'the', 'or', 'and'
+import pandas as pd # For converting results to a dataframe and bar chart plots
+import math
+from string import digits
+from functools import reduce
+import time
+import collections
+from http.cookiejar import CookieJar
+import ssl
+
+import socket
+from time import sleep
+socket.setdefaulttimeout(60) #if it takes longer than a minute to connect to webpage, move on
+
+
+#Function to scrape job listings from indeed.  Used in ScrapeJobListings
+def get_skills(website,formatted_skills,gcontext,keys,values):
+    skill_dict = dict(zip(keys, values))
+    repls = ('re-', 're'), ('co-', 'co'), ('non-','non'),('&','and'),(',','')
+    req=urllib.request.Request(website,data=None,headers={'User-Agent':'Mozilla/5.0 (Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.0.5)'})
+    cj = CookieJar()
+    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+    opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.0.5)')]
+    opener.addheaders =[('Accept','text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')]
+    response = opener.open(req)
+    html = response.read().decode('utf8', errors='ignore')
+    response.close()
+    
+    soup = BeautifulSoup(html,"lxml")
+    [s.extract() for s in soup(['style', 'script', '[document]', 'head', 'title'])]
+    visible_text = soup.getText()
+    lines = (line.strip() for line in visible_text.splitlines()) # break into lines
+    text=' '.join([line for line in lines if line is not ''])
+
+    #dictionary counting appearances of formatted skills
+    skills = []
+
+    # define desired replacements here
+    formatted_text = reduce(lambda a, kv: a.replace(*kv), repls, text.lower()).replace('-',' ')    
+    #Search for each skill in our database
+    for skill in formatted_skills:
+
+        #Only check the skill if it shows up in the listing
+        if (skill in formatted_text): #sum(1 for _ in re.finditer(r'\b%s\b' % re.escape(skill), formatted_text)) > 0:
+            skills += [skill_dict[skill]] * sum(1 for _ in re.finditer(r'\b%s\b' % re.escape(skill), formatted_text))
+
+            #To prevent multi-counting, remove the skill from the text
+            #It's okay to do this, since formatted_skills is sorted by length of skills
+            formatted_text = re.sub(r"\b%s\b" % re.escape(skill), '', formatted_text)
+            
+    return (text,skills)
+
+def ScrapeJobListings(job_title):
+    '''scrapes listings for a particular job title on indeed
+    will update the listing info if it is already in our database
+    ob_title should be in format "data+scientist" '''
+
+    #First get skills and formatted skills from our JobSkills DB              
+    con = mdb.connect('localhost', 'raknoche', 'localpswd', 'indeed_database',charset='utf8');
+                    
+    with con:
+        cur = con.cursor()
+        cur.execute("SELECT JobSkill,FormattedJobSkill FROM JobSkills;")
+        all_skills= cur.fetchall()
+
+    keys = [key for (value,key) in all_skills]
+    values = [value for (value,key) in all_skills]
+
+    formatted_skills = sorted(keys,key=lambda x: len(x),reverse=True)
+
+    #Next scrape indeed search page for number of listings
+    gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1) 
+    total_count=0
+    job_url = 'http://www.indeed.com/jobs?q="' + job_title + '"'
+    html = urllib.request.urlopen(job_url).read() 
+    base_url = 'http://www.indeed.com'
+
+
+    #Connect to the job search url
+    #with urllib.request.urlopen('http://www.python.org') as page:
+
+    html = urllib.request.urlopen(job_url).read() 
+
+    # Get the first page
+    soup = BeautifulSoup(html,"lxml") 
+
+    # Find how many jobs are listed
+    try:
+        num_jobs_area = soup.find(id = 'searchCount').string.encode('utf-8')                                                  
+        job_numbers = re.findall('\d+',num_jobs_area.decode("utf-8"))
+
+        # Have a total number of jobs greater than 1000
+        if len(job_numbers) > 3: 
+            total_num_jobs = (int(job_numbers[2])*1000) + int(job_numbers[3])
+        else:
+            total_num_jobs = int(job_numbers[2]) 
+
+        # Determine how many "next" pages there are
+        num_pages = math.ceil(total_num_jobs/10) 
+
+        # Store all our descriptions in this list
+        all_job_titles=[]
+        all_job_locations=[]
+        all_job_skills=[]
+
+        # Loop through all of our search result pages
+        for i in range(0,min(num_pages,100)): 
+            #print(num_pages)
+            try:
+                print ('Getting page ', i+1, ' of ', min(num_pages,100),' for ', job_title)
+                start_num = str(i*10) 
+                current_page = ''.join([job_url, '&start=', start_num])
+
+                html_page = urllib.request.urlopen(current_page).read() 
+                page_obj = BeautifulSoup(html_page,"lxml") 
+
+                #Initialize lists
+                job_titles = []
+                job_urls = []
+                job_locations = []
+                job_skills = []
+
+                #Get title and link to listing
+                job_link_area = page_obj.find(id = 'resultsCol') 
+                for job in job_link_area.find_all('h2'):
+                    job_titles.append(job.find('a').get('title'))
+                    job_urls.append(base_url + job.find('a').get('href'))
+
+                #Get job locations
+                for job in job_link_area.find_all('span'):
+                    if job.find('span',{"class" : ['location']}):
+                        location = job.find('span',{"class" : ['location']}).span.text
+                        remove_digits = str.maketrans('', '', digits) #remove zip codes
+                        location = location.translate(remove_digits)
+                        location = location.rstrip()
+                        location=location.split('(')
+                        location=location[0]
+                        job_locations.append(location.rstrip())
+
+                #Get skills from the job listings
+                for j in range(0,len(job_urls)):
+                    #print(job_urls[j])
+                    try:
+                        listing_text, these_skills = get_skills(job_urls[j],formatted_skills,gcontext,keys,values)
+                    except:
+                        listing_text = None
+                        these_skills = None
+                        print('Error getting job skills')
+
+                    if these_skills:
+                        try:
+
+                            con = mdb.connect('localhost', 'raknoche', 'localpswd', 'indeed_database',charset='utf8');
+
+                            with con:
+                                cur = con.cursor()
+                                test_query = "SELECT (1) FROM JobListings WHERE UniqueURL = %s"
+
+                                if not cur.execute(test_query,(job_urls[j][21:])):                     
+                                    total_count+=1
+                                    #print('Total count should be ', total_count)
+                                    insert_query = "INSERT INTO JobListings(JobSearched, TimeSearched, JobTitle, JobLocation, JobSkills, ListingText, UniqueURL) VALUES(%s,%s,%s,%s,%s,%s,%s)"
+                                    
+                                    cur.execute(insert_query,(job_title,time.strftime("%d/%m/%Y %H:%M:%S"),job_titles[j],job_locations[j],str(these_skills),listing_text.encode('unicode_escape'),job_urls[j][21:]) )  
+
+                        except:
+                            print("Issue with MySQL Insert")
+                    #else:
+                        #print("No Skills Found")
+
+            except:
+                print ("Couldn't open page", i+1)
+    except:
+        print('No jobs listings found')
+
+
+#Function for calculating association rules for a specific job title
+def calc_association(job_type):
+    #Get list of job skills
+    con = mdb.connect('localhost', 'raknoche', 'localpswd', 'indeed_database',charset='utf8');
+                
+    with con:
+        cur = con.cursor()
+        cur.execute("SELECT JobSkill,FormattedJobSkill FROM JobSkills;")
+        all_skills= cur.fetchall()
+        
+    skills_list = [skill.lower() for (skill,formatted_skill) in all_skills]
+
+    #Get Job Listings Docs
+    con = mdb.connect('localhost', 'raknoche', 'localpswd', 'indeed_database');
+
+    with con:
+        cur = con.cursor(mdb.cursors.DictCursor)
+        cur.execute("SELECT JobSkills FROM JobListings WHERE JobSearched = '%s'" % (job_type))
+
+        rows = cur.fetchall()
+
+        all_docs = [ast.literal_eval(row['JobSkills']) for row in rows]
+
+    all_docs=[[item.lower() for item in doc] for doc in all_docs]
+
+    #For each job listing, convert the list of skills to the a list of booleans, which state whether each of our 
+    #skills in the full skill list exists in the job listing
+    doc_booleans = [[skill in doc for skill in skills_list] for doc in all_docs]
+    doc_booleans = lil_matrix(doc_booleans)
+
+    #Find frequent itemsets for the specific type of job
+    #If we have 1000 job listings, then 1% means the itemset shows up in 10 of them
+    if (len(all_docs) > 20):
+        iter_count=1
+        itemsets = dict(frequent_itemsets(doc_booleans, 1/(2**iter_count)))
+        iter_count = iter_count+1
+                    
+        while (np.floor(len(itemsets)/300) <= 0):
+            itemsets = dict(frequent_itemsets(doc_booleans, 1/(2**iter_count)))
+            iter_count = iter_count+1
+
+        #Make association rules for the specific type of job
+        rules = association_rules(itemsets, .1)
+        rules = list(rules)
+
+        #Sort by complexity of the skill subset
+        rules=sorted(rules,key=lambda x: len(x[0]),reverse=True)
+
+        #Remove any multi-skill suggestions.  We only want subset -> single skill rules
+        #Result is formatted as user skills, suggested skill, confidence
+        single_suggestions = [[[skills_list[idx] for idx in list(rule[0])],skills_list[list(rule[1])[0]],rule[3]] for rule in rules if len(rule[1]) == 1]
+        
+        #Sort by complexity of the skill subset, then by confidence
+        single_suggestions = sorted(single_suggestions,key=lambda x: (len(x[0]),x[2]),reverse=True)
+        
+        #Place the results in a new table in our DB, with columns [job,skill_subset,suggested_skill,confidence]
+        con = mdb.connect('localhost', 'raknoche', 'localpswd', 'indeed_database');    
+        with con:
+            cur = con.cursor()
+
+            #Note: UniqueID will fail if user_skill subset is more than~50 skills long.  I doubt we will ever have associaiton rules that 
+            #use that many skills, so should be fine.
+            insert_query = "REPLACE INTO SkillAssociations SET JobType=%s, UserSkills=%s, SuggestedSkill=%s, Confidence=%s, UniqueRuleID=%s;"
+
+            for rule in single_suggestions:
+                cur.execute(insert_query,(job_type,str(rule[0]),rule[1],rule[2],job_type+'+'+str(rule[1])+str(rule[0])) )
+        
+#Runs calc_associations on all job titles in our job listing database:
+def UpdateAssociations():
+    con = mdb.connect('localhost', 'raknoche', 'localpswd', 'indeed_database');
+
+    with con:
+        cur = con.cursor(mdb.cursors.DictCursor)
+        cur.execute("SELECT distinct(JobSearched) FROM JobListings")
+        
+        rows = cur.fetchall()
+
+        all_job_searched = [row['JobSearched'] for row in rows]
+
+    for job in all_job_searched:
+        calc_association(job)
+
+
+
+
+
 def UpdateCareerModel():
     ''' Run this to update the tf-idf model used to suggest careers'''
     con = mdb.connect('localhost', 'raknoche', 'localpswd', 'indeed_database');
