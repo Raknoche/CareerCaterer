@@ -1,0 +1,123 @@
+Aircraft Mechanic
+Assembler
+Assembly Supervisor
+Assistant Plant Manager
+Boilermaker
+Bookbinder
+CNC Machinist
+Chemical Plant Operator
+Chief Manufacturing Executive
+Chief Quality Control Executive
+Civil Engineering Supervisor
+Cnc Operator
+Computer Control Programmer
+Configuration Analyst
+Controller
+Controls Engineer
+Customer Service Representative
+Dairy Processing Equipment Operator
+Design Engineer
+Designer
+Quality Manager
+Distribution Manager
+Division Manager
+Electrician
+Electromechanical Technician
+Electronic Assembler
+Electronic Technician
+Engineer
+Equipment Technician
+Estimating Manager
+Expediter
+Facilities Manager
+Fiberglass Laminator/Fabricator
+Field Service Technician
+Floor Assembler
+Floor Assembly Supervisor
+Food Technologist
+General Laborer
+General Manager
+Industrial Engineer
+Industrial Engineering Technician
+Inspector
+Machine Operator
+Machine Shop Supervisor
+Machinists
+Manufacturing Technician
+Production Technician
+Manufacturing Engineer
+Manufacturing Process Engineer
+Manufacturing Production Manager
+Manufacturing Technician
+Master Scheduler
+Material Handler
+Materials Management Supervisor
+Materials Manager
+Materials Planner
+Mechanical Designer
+Mechanical Engineer
+Mechanical Technician
+Metal workers
+Millwright
+Operations Clerk
+Operations Manager
+Operator
+Packaging Engineer
+Plant Accountant
+Painting and Coating Worker
+Photographic Processor
+Plant Human Resources Manager
+Plant Manager
+Plant Operator
+Powerhouse Supervisor
+Power Plant Operator
+Precision Assembler
+Printing Machine Operators
+Process Engineer
+Product Design Engineer
+Process Engineer
+Process Operator
+Product Development Engineer
+Production Control Clerk
+Production Control Manager
+Production Engineering Manager
+Product Manager
+Product Marketing Analyst
+Production Foreman
+Production Painter
+Production Planner
+Scheduler
+Production Supervisor
+Production Technician
+Production Worker
+Project Manager
+Purchasing Agent
+Quality Assurance Engineer
+Quality Assurance Manager
+Quality Control Analyst
+Quality Control Inspector
+Quality Engineer
+Quality Inspector
+Quality Manager
+Reliability Engineer
+Safety Manager
+Safety Technician
+Senior Buyer
+Semiconductor Processor
+Shift Supervisor
+Shipping and Receiving Manager
+Silicon Wafer Fabrication Operator
+Surface Mount Technology Machine Operator
+Structural Metal fabricator
+Supplier Quality Engineer
+Test Engineer
+Tool Crib Attendant
+Tool Room Supervisor
+Tool and Die Maker
+Wafer Processing Technician
+Warehouse Associate
+Warehouse Manager
+Warehouse Worker
+Waste Treatment Plant Operator
+Welder
+Woodworker

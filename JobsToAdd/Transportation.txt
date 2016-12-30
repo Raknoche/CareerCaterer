@@ -1,0 +1,99 @@
+Aircraft Pilot
+Airport Operations Crew Member
+Air Traffic Controllers
+Bus Driver
+Cab Driver
+Captain
+Chauffeur
+Conductor
+Courier
+Crew
+Deckhand
+Deck Officer
+Delivery Helper
+Delivery Drivers
+Dispatcher
+Distribution Center Manager
+Distribution Director
+Distribution Manager
+Driver
+Engineer
+Equipment Director
+Estimator
+Estimating Manager
+Expeditor
+Fleet Coordinator
+Fleet Manager
+Flight Attendant
+Flight Instructor
+Flight Engineer
+Fork Lift Operator
+Gate Operations Staff
+Helicopter Pilot
+Import/Export Clerk
+Import/Export Manager
+Import/Export Supervisor
+Industrial Tractor Operator
+Inventory Control Analyst
+Inventory Control Clerk
+Inventory Control Manager
+Inventory Control Supervisor
+Locomotive Engineer
+Logistics Analyst
+Logistics Coordinator
+Logistics Manager
+Logistics Specialist
+Marine Cargo Inspector
+Marine Oiler
+Materials Control Manager
+Materials Handler
+Materials Handling Supervisor
+Materials Planner
+Merchant Mariners
+Motorboat Operator
+Motor Racer
+Operations Manager
+Operations Security
+Package Handler
+Packaging Engineer
+Pilot
+Production Scheduler
+Public Transportation Inspector
+Rail Car Repairer
+Railroad Brake Operator
+Railroad Conductor
+Railroad Yard Worker
+Rail Yard Engineer
+Refuse and Recyclable Material Collectors
+Route Driver
+Route Supervisor
+Sailor
+Scheduler
+Shipping and Receiving Clerk
+Shipping and Receiving Supervisor
+Shuttle Car Operator
+Streetcar Operator
+Subway Operator
+Taxi Driver
+Top Distribution Executive
+Top Inventory Control Executive
+Traffic Analyst
+Rate Analyst
+Traffic Clerk
+Traffic Director
+Traffic Manager
+Traffic Supervisor
+Train Crew Member
+Train Operator
+Transportation Analyst
+Transportation Broker
+Transportation Director
+Transportation Manager
+Transportation Planner
+Transportation Supervisor
+Travel Coordinator
+Travel Manager
+Truck Driver
+Truck Driver Supervisor
+Van Driver
+Yardmaster

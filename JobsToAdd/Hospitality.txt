@@ -1,0 +1,96 @@
+Back Office Assistant
+Crew Member
+Greeter
+Back Office Supervisor
+Corporate Sales Manager
+Director of Operations
+Director of Maintenance
+Director of Marketing
+Director of Sales
+Events Manager
+Executive Housekeeper
+Executive Conference Manager
+Executive Meeting Manager
+Front Office Supervisor
+General Manager
+Public Relations Coordinator
+Public Relations Manager
+Sales and Marketing Coordinator
+Sales Coordinator
+Sales Manager
+Shift Leader
+Shift Manager
+Bell Attendant
+Bellhop
+Bellman
+Bellperson
+Concierge
+Concierge Agent
+Director of Hotel Sales
+Director of Hotel Operations
+Driver
+Front Desk Clerk
+Front Desk Agent
+Front Desk Associate
+Front Desk Sales and Service Associate
+Front Office Associate
+Front Office Attendant
+Front Office Associate
+Gardener
+Groundskeeper
+Group Sales Coordinator
+Group Sales Manager
+Guest Room Sales Manager
+Guest Services Associate
+Guest Services Coordinator
+Guest Services Manager
+Guest Service Representative
+Hotel Deposit Clerk
+Hotel Group Sales Manager
+Housekeeper
+Housekeeper Aide
+Housekeeping Supervisor
+Lead Housekeeper
+Events Coordinator
+Maintenance Supervisor
+Maintenance Worker
+Marketing Coordinator
+Meeting Coordinator
+Meeting Concierge
+Meeting Specialist
+Meeting Manager
+Night Auditor
+Night Clerk
+Reservations Agent
+Room Attendant
+Room Service Manager
+Room Service Worker
+Transportation Coordinator
+Valet Attendant
+Valet Parker
+Valet Parking Attendant
+Wedding Coordinator
+Wedding Sales Manager
+Backwaiter
+Banquet Server
+Banquet Manager
+Bartender
+Bar Staff
+Busser
+Cafe Manager
+Catering Manager
+Catering Sales Manager
+Chef
+Cook
+Dishwasher
+Food and Beverage Manager
+Food Runner
+Food Server
+Host
+Hostess
+Kitchen Team Member
+Restaurant Manager
+Server
+Waiter
+Waitress
+Wait Staff

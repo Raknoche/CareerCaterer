@@ -1,0 +1,156 @@
+Account Executive
+Account Manager
+Accountant
+Accounting Clerk
+Accounting Manager
+Administrative Assistant
+Administrative Medical Assistant
+Administrator
+Admissions Clerk
+Admissions Director
+Analyst
+Anesthesiologist
+Assistant Administrator
+Assistant Admissions Director
+Assistant Director of Nursing
+Bereavement Coordinator
+Bereavement Counselor
+Billing Manager
+Billing Specialist
+Biologist
+Biomedical Technician
+Business Analyst
+Case Manager
+Certified Medical Assistant
+Certified Nurse Assistant
+Certified Nursing Assistant
+Certified Pharmacy Technician
+Charge Nurse
+Chief Financial Officer
+Claims Examiner
+Claims Specialist
+Clerk
+Clinical Research Associate
+Clinical Research Coordinator
+Clinical Specialist
+Coder
+Coding Educator
+Computer Analyst
+Computer Programmer
+Consultant
+Coordinator
+Counselor
+Customer Service Rep
+Customer Service Representative
+Dental Assistant
+Dental Hygienist
+Dentist
+Dietitian
+Director of Nursing
+Director of Operations
+Director of Rehabilitation
+Doctor
+Emergency Medical Technician
+Executive Assistant
+Executive Director
+Financial Analyst
+Front Office Clerk
+Health Educator
+Healthcare Administrator
+Healthcare Management
+Healthcare Specialist
+Home Health Aide
+Hospice Aide
+Hospice Administrator
+Hospice Counselor
+IT Specialist
+Information Technology Specialist
+Licensed Practical Nurse
+Massage Therapist
+Medical Administrative
+Medical Assistant
+Medical Assistant or phlebotomist
+Medical Assistant or receptionist
+Medical Biller
+Medical Billing Specialist
+Medical Claims and Billing Specialist
+Medical Coder
+Medical Office Assistant
+Medical Office Manager
+Medical Office Specialist
+Medical or Health Services Manager
+Medical Receptionist
+Medical Records Clerk
+Medical Records Director
+Medical Records Technician
+Medical Sales
+Medical Secretary
+Medical Technician
+Medical Technologist
+Medical Transcriptionist
+Microbiologist
+Nurse
+Nurse Aide
+Nurse Practitioner
+Nursing Assistant
+Nursing Home Administrator
+Nutritionist
+Occupational Therapist
+Office Assistant
+Office Clerk
+Office Manager
+Operations Manager
+Orderly Attendant
+Paramedic
+Patient Care Associate
+Patient Services Technician
+Patient Services Representative
+Pharmaceutical Sales
+Pharmaceutical Sales Rep
+Pharmaceutical Sales Representative
+Pharmacist
+Pharmacy Clerk
+Pharmacy Technician
+Phlebotomist
+Physical Therapist
+Physician
+Physician's Aide
+Physician's Assistant
+Program Director
+Program Manager
+Programmer
+Programmer Analyst
+Programmer
+Project Management
+Project Manager
+Psychiatric Aide
+Quality Coordinator
+Registered Nurse
+Receptionist
+Recruiter
+Regional Sales Manager
+Registered Medical Assistant
+Registered Nurse
+Research Assistant
+Research Associate
+Respiration Therapist
+Sales Associate
+Sales Manager
+Sales Rep
+Sales Representative
+Secretary
+Senior Programmer Analyst
+Social Services
+Software Developer
+Software Engineer
+Sonographer
+Staffing Coordinator
+Supervisor
+Supervisor or manager
+Supply Technician
+Surgical Technologist
+Therapist
+Transcription
+Transcriptionist
+Ultrasonographer
+Vice President

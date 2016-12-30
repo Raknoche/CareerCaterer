@@ -1,0 +1,152 @@
+Veterinarian
+Animal Welfare Veterinarian
+Aquatic Veterinarian
+Avian Veterinarian
+Bovine Veterinarian
+Clinical Pathology Vet Tech
+Clinical Practice Vet Tech
+Emergency & Critical Care Veterinarian
+Equine Veterinarian
+Equine Vet Tech
+Feline Veterinarian
+Internal Medicine Veterinarian
+Lab Animal Veterinarian
+Relief Veterinarian
+Small Animal Veterinarian
+Small Animal Veterinary Technician
+Large Animal Veterinarian
+Mixed Practice Veterinarian
+Track Veterinarian
+Veterinary Anesthesiologist
+Veterinary Dermatologist
+Veterinary Epidemiologist
+Veterinary Microbiologist
+Veterinary Nutritionist
+Veterinary Opthalmologist
+Veterinary Pathologist
+Veterinary Radiologist
+Vet Tech Anesthetist
+Veterinary Surgeon
+Veterinary Surgical Tech
+Veterinary Theriogenologist
+Zoo Veterinarian
+Animal Assisted Therapist
+Animal Chiropractor
+Animal Geneticist
+Animal Health Inspector
+Artificial Insemination Technician
+Canine Rehabilitation Therapist
+Veterinary Pharmacist
+Veterinary Practice Manager
+Veterinary Receptionist
+Beef Extension Agent
+Cattle Feedlot Manager
+Dairy Farmer
+Dairy Inspector
+Dairy Herdsman
+Dairy Nutritionist
+Ranch Manager
+Animal Control Officer
+Animal Cruelty Investigator
+Animal Shelter Manager
+Detection Dog Handler
+Dog Breeder
+Dog Groomer
+Dog Show Handler
+Dog Trainer
+Dog Walker
+Doggie Day Care Owner
+Humane Educator
+Kennel Attendant
+Kennel Manager
+K-9 Police Officer
+Pet Adoption Counselor
+Pet Bakery Owner
+Pet Boutique Owner
+Pet Sitter
+Mobile Dog Groomer
+Pooper Scooper Business Owner
+Service Dog Trainer
+Barn Manager
+Bloodstock Agent
+Broodmare Manager
+Clocker
+Dude Ranch Wrangler
+Equine Dental Technician
+Equine Extension Agent
+Equine Pedigree Analyst
+Equine Veterinarian
+Equine Veterinary Technician
+Exercise Rider
+Farm Manager
+Farrier
+Foaling Attendant
+Groom
+Horse Identifier
+Horse Show Braider
+Horse Show Judge
+Horse Trainer
+Horsemen's Bookkeeper
+Hot Walker
+Jockey
+Jockey Agent
+Jockey Valet
+Mounted Police Officer
+Paddock Judge
+Racehorse Trainer
+Racetrack Outrider
+Racetrack Starter
+Racing License Clerk
+Racing Secretary
+Racing Steward
+Riding Instructor
+Saddle Fitter
+Stallion Booking Secretary
+Stallion Manager
+Tack Shop Owner
+Yearling Manager
+Aquaculture Farmer
+Aquarist
+Marine Biologist
+Marine Mammalogist
+Marine Mammal Trainer
+Ichthyologist
+Herpetologist
+Reptile Breeder
+Aquatic Veterinarian
+Beekeeper
+Entomologist
+Fish and Game Warden
+Herpetologist
+Ichthyologist
+Marine Mammalogist
+Ornithologist
+Primatologist
+Wildlife Biologist
+Wildlife Manager
+Wildlife Forensic Scientist
+Wildlife Inspector
+Wildlife Rehabilitator
+Wildlife Technician
+Wildlife Veterinarian
+Zoo Commissary Keeper
+Zoo Curator
+Zoo Development Director
+Zoo Director
+Zoo Educator
+Zoo Habitat Designer
+Zoo Keeper
+Zoo Nutritionist
+Zoo Registrar
+Zoologist
+Zoo Veterinary Technician
+Animal Editor
+Animal Career Recruiter
+Animal Lawyer
+Animal Photographer
+Animal Science Professor
+Equine Photographer
+Grant Writer
+Movie Animal Trainer
+Pet Portrait Artist
+Pet Writer

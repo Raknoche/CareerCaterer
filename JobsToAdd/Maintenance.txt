@@ -1,0 +1,70 @@
+Bricklayer
+Carpenter
+Elevator Installer
+Grinder
+Concrete Finisher
+HVAC Mechanic
+Locksmith
+Millwright
+Painter
+Pest Control Technician
+Pipefitter
+Plumber
+Resteel Ironworker
+Jig and Fixture Builder
+Structural Assembler
+Structural Ironworker
+Lineman
+Cleaning Crew
+Custodian
+Custodial Manager
+General Laborer
+General Maintenance Worker
+Building and Grounds Supervisor
+Groundskeeper
+Head of Housekeeping
+Housekeeper
+Housekeeping Dispatcher
+Housekeeping Manager
+Housekeeping Supervisor
+Janitor
+Industrial Cleaner
+Laundry Attendant
+Lawn Service Manager
+Mechanic
+Landscaper
+Maintenance Planner
+Maintenance Supervisor
+Pruner
+Vehicle Washer
+Electrician
+Facilities Director
+Facilities Planner
+Facilities Supervisor
+Field Operator
+Field Service Coordinator
+Floor Technician
+Pipeline Maintenance Manager
+Pipeline Operations Manager
+Pipeline Technician
+Pipelines Director
+Pipelines Manager
+Powerhouse Supervisor
+Security Director
+Spares Coordinator
+Facilities Management Executive
+Field Operations Executive
+Installation & Maintenance Executive
+Pipeline Executive
+Estimating Manager
+Clinical Facilities Planning Manager
+Waste Water Treatment Plant Manager
+Safety Technician
+Assembly Supervisor
+Dairy Processing Equipment Repairer
+District Technical Service Manager
+Installation & Maintenance Technician Director
+Interior Aircraft Assembly Manager
+Operations Research Analyst
+Operations Manager
+Production Supervisor

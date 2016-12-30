@@ -1,0 +1,55 @@
+Cashier
+Customer Service Assistant
+Customer Service Manager
+Customer Service Representative
+Merchandiser
+Display Assistant
+Display Manager
+Display Merchandiser
+District Sales Manager
+Divisional Manager
+Executive Merchandise Trainee
+Floor Area Manager
+Floor Leader
+Floor Manager
+Footwear Buyer
+General Manager
+Global Logistics Supervisor
+Graphic Designer
+Branch Manger
+Inventory Associate
+Inventory Taker
+Inventory Manager
+Loss Prevention Specialist
+Order Filler
+Order Picker
+Paint Specialist
+Product Demonstrator
+Procurement Specialist
+Promotions Coordinator
+Regional Manager
+Retail Administration Analyst
+Retail Associate Store Manager
+Retail Buyer 
+Retail Customer Service Associate
+Retail Food Service Manager
+Retail Leadership Development Program
+Retail Management Trainee
+Retail Marketing Specialist
+Retail Personal Banker
+Retail Sales Associate
+Photographer
+Retail Sales Consultant
+Retail Sales Representative
+Retail Security Officer
+Retail Trainee
+Retail Team Leader
+Sales Associate
+Sales Manager
+Art Director
+Service Supervisor
+Stock Clerk
+Store Manager
+Supervisor
+Visual Merchandiser
+Warehouse Manager
