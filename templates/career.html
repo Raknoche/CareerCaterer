@@ -90,20 +90,22 @@
 
 
         //set up plot parameters
+        var user_skill_height = skill_set.length*50; //height of user skills on the left of plot
+
         var bar_width = 20 //width of bars
-        var bar_spacing = 4 //spacing between bars
         var bar_graph_width = 600 // width of bar graph
-        var bar_graph_height = assoc_set.length*(bar_width+bar_spacing)//height of bar graph
+        var bar_graph_height = assoc_set.length*bar_width*1.8//height of bar graph
         var bar_graph_horizontal_start = 400 //x-location of bar graph
         var top_bar_gap = 30 // space between the top of the graph and the top bar
         var text_offset = 10 // space between Y-axis and and start of text on bar
-        var canvas_width = bar_graph_horizontal_start + bar_graph_width + 100 //width of the canvas
-        var canvas_height = bar_graph_height + 100//height of the canvas
+        var canvas_width = bar_graph_horizontal_start + bar_graph_width + 40 //width of the canvas
+        var canvas_height = Math.max(bar_graph_height+100,user_skill_height) //height of the canvas
 
-        var min_stroke_width=0.01 //minimum width of assoication line
-        var max_stroke_width = 3 //maximum width of association line
+        var min_stroke_width=0.2 //minimum width of assoication line
+        var max_stroke_width = 2 //maximum width of association line
         var path_x_offset=120 //space between user skills on left and the start of the paths
         var path_y_offset=10 //shifting paths upward to align with text better
+
 
         var colors = ['#0000b4','#0082ca','#0094ff','#0d4bcf','#0066AE','#074285','#00187B','#285964','#405F83','#416545','#4D7069','#6E9985','#7EBC89','#0283AF','#79BCBF','#99C19E'];
 
@@ -117,11 +119,11 @@
         //This is used to scale the width of the bars
         //The highest confidence possible is 1.0 * number of user skills
         //"Very strong" =4 on x-axis, so scale such that highest confidence is <= 4
-        //In reality we'll never have a skill association of 4... so we can use x_max+1 to make scale a little better
+        //In reality we'll never have a skill association of 4... so we can use x_max+1 to make scale look a little better
+        //Also need the +0.75 so the text is all legible =)
         var x_max = 4;
         for(var i=0; i<confidence_set.length; i++) {
-            console.log(assoc_set[i] + "->" + confidence_set[i])
-            confidence_set[i] *= (x_max+1)/skill_set.length;
+            confidence_set[i] = confidence_set[i]*(x_max+1)/skill_set.length +0.75;
         }
 
 
@@ -132,7 +134,7 @@
 
         var bar_graph_yscale = d3.scale.linear()
                         .domain([0,assoc_set.length])
-                        .range([top_bar_gap,bar_graph_height]);
+                        .range([0,bar_graph_height]);
 
         // set up canvas
         var canvas = d3.select('#wrapper')
@@ -145,13 +147,13 @@
         var num_grid_lines = experienceName.length
         var grid_spacing = bar_graph_width/(num_grid_lines-1)
         var grid = d3.range(num_grid_lines).map(function(i){
-            return {'x1':0,'y1':10,'x2':0,'y2':bar_graph_height};
+            return {'x1':0,'y1':-top_bar_gap,'x2':0,'y2':bar_graph_height};
         });
 
         // draw grid lines on the canvas
         var grids = canvas.append('g')
                           .attr('id','grid')
-                          .attr('transform','translate('+bar_graph_horizontal_start+',0)')
+                          .attr('transform','translate('+bar_graph_horizontal_start+','+(canvas_height - bar_graph_height)/2+')')
                           .selectAll('line')
                           .data(grid)
                           .enter()
@@ -166,31 +168,32 @@
         // set up scaling for user skills
         var user_yscale = d3.scale.linear()
                         .domain([0,skill_set.length])
-                        .range([top_bar_gap,bar_graph_height]);
+                        .range([top_bar_gap,user_skill_height]);
 
         //Draw user skills to left of bars
-        var user_skill_txt = canvas.append('g').selectAll('text')
+        var user_skill_txt = canvas.append('g')
+                            .selectAll('text')
                             .data(skill_set)
                             .enter()
                             .append('text')
-                            .attr({'x':function(d) {return 0; },'y':function(d,i){ return user_yscale(i)+top_bar_gap; }})
+                            .attr({'x':function(d) {return 0; },'y':function(d,i){ return user_yscale(i) + (canvas_height - user_skill_height)/2; }})
                             .text(function(d){ return d; });
             
                           
         //Draw paths connect user skills to the associated skill suggestions
         var diagonal = d3.svg.diagonal()
-            .source(function(d) {return {"x":user_yscale(skill_set.indexOf(d)) + 0.8*top_bar_gap, "y":0}; })
-            .target(function(d,i) {return {"x":bar_graph_yscale(assoc_set.indexOf(assoc_list[i])), "y":bar_graph_horizontal_start-path_x_offset}; })
+            .source(function(d) {return {"x":user_yscale(skill_set.indexOf(d)) -5 + (canvas_height - user_skill_height)/2, "y":0}; })
+            .target(function(d,i) {return {"x":bar_graph_yscale(assoc_set.indexOf(assoc_list[i])) + (canvas_height - bar_graph_height)/2, "y":bar_graph_horizontal_start-path_x_offset}; })
             .projection(function(d) { return [d.y, d.x]; });
         
+        //scaling cofidence strength to look better on stroke width
         var scaled_strength = []
         for (i=0;i<strength_list.length;i++){
 
-            scaled_strength[i] = (strength_list[i] - Math.min.apply(Math, strength_list)+min_stroke_width)*(max_stroke_width/(Math.max.apply(Math, strength_list)-Math.min.apply(Math, strength_list) + min_stroke_width))
+            scaled_strength[i] = Math.pow((strength_list[i] - Math.min.apply(Math, strength_list)+min_stroke_width)*(max_stroke_width/(Math.max.apply(Math, strength_list)-Math.min.apply(Math, strength_list) + min_stroke_width)),2)
         }        
 
-        console.log(scaled_strength)
-
+        //draw paths
         var skill_path = canvas.append('g')
                             .attr('transform','translate('+path_x_offset+',0)')
                             .selectAll('path')
@@ -224,7 +227,7 @@
 
         //draw x-axis
         var x_xis = canvas.append('g')
-                          .attr("transform", "translate("+bar_graph_horizontal_start+","+bar_graph_height+")")
+                          .attr("transform", "translate("+bar_graph_horizontal_start+","+((canvas_height - bar_graph_height)/2 + bar_graph_height)+")")
                           .attr('id','xaxis')
                           .call(xAxis);
 
@@ -237,7 +240,7 @@
 
         // draw bars
         var chart = canvas.append('g')
-                            .attr("transform", "translate("+bar_graph_horizontal_start+",0)")
+                            .attr("transform", "translate("+bar_graph_horizontal_start+","+(canvas_height - bar_graph_height)/2+")")
                             .attr('id','bars')
                             .selectAll('rect')
                             .data(confidence_set)

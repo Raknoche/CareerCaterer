@@ -49,6 +49,9 @@ dbskills = [skill for (skill,formatted_skill) in all_skills]
 dbskills_formatted = [formatted_skill for (skill,formatted_skill) in all_skills]
 dbcareers = [job[0].replace('+',' ').title() for job in all_jobs]
 
+print("TEST")
+print('email' in dbskills)
+
 del all_skills
 del all_jobs
 
@@ -175,7 +178,6 @@ def search_for_career():
         sims, all_urls, all_titles = SuggestJobListings(user_skills,searched_career)
         final_suggestions,final_confidence,final_complexity,final_used_skills = SuggestJobSkills(user_skills,searched_career,dbskills)
 
-        
         #Bookkeeping
         suggested_listings = [all_urls[item[0]] for item in sims]
         listing_strength = [float(item[1]) for item in sims]
@@ -245,7 +247,7 @@ def career_page():
     #Limit to strong (>1.5) associations only
     idx_to_drop=[]
     assoc_to_drop=[]
-    min_assoc=1.5
+    min_assoc=0.4
     for (idx,conf) in enumerate(strength_set):
         if conf < min_assoc:
             idx_to_drop.append(idx)
@@ -266,7 +268,7 @@ def career_page():
 
 
     return render_template("career.html", career=searched_career, skill_suggestions = zip(final_suggestions,final_confidence,final_complexity),\
-                                skill_sugg_len = len(final_suggestions),suggestions=zip(suggested_listings,listing_strength,job_titles),\
+                                skill_sugg_len = len(assoc_set),suggestions=zip(suggested_listings,listing_strength,job_titles),\
                                 final_suggestions=final_suggestions,final_confidence=final_confidence,final_complexity=final_complexity,\
                                 skill_list=skill_list,assoc_list=assoc_list,strength_list=strength_list,\
                                 skill_set=skill_set,assoc_set=assoc_set,strength_set=strength_set)

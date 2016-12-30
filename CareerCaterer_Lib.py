@@ -158,7 +158,7 @@ def SuggestJobSkills(user_skills,career,skills_list):
 
             for skill in result:
                 #Only interested in skills the user doesn't already have
-                if (skill[0] not in user_skills):
+                if (skill[0] not in user_skills) and (skill[0].lower() in skills_list):
                     suggested_skills.append(skill[0])
                     suggestion_confidence.append(skill[1])
                     suggestion_complexity.append(length)

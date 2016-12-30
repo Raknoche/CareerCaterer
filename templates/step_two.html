@@ -9,7 +9,7 @@
     <br>
     <!-- Search for a job -->
     <div class="row">
-        <div class="col-lg-4 col-lg-offset-1">
+        <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 col-sm-6 col-xs-12">
         <center>
             <form action="{{ url_for('search_for_career') }}" method="POST">
                 <label for="typeahead">Search for a specific career:</label>
@@ -24,18 +24,23 @@
         </div>
 
         <!-- or -->
-        <div class="col-lg-2" style="text-align: center;">
+        <div class="col-lg-1 col-md-2 col-sm-2" style="text-align: center;">
+
             <br>
-            <h4>or</h4>
+            <h4><center>or</center></h4>
             <br>
+
         </div>
 
         <!-- Keyword input -->
+        <div class="col-lg-3 col-md-2 col-sm-2" style="text-align: center;">
+
         <form action="{{url_for('suggested_career')}}" method="get">
             <br>
             <button type="submit" class="btn btn-primary btn-lg" role="button">Let us suggest a career</button>
             <br>
         </form>
+        </div>
     </div>
 
 
