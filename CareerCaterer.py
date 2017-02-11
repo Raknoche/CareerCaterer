@@ -326,7 +326,6 @@ def add_career_to_db():
     return redirect(url_for('Step2'))
 
 #Letting users suggest a skill be removed from our DB
-'''THIS ISN"T WORKING BECAUSE I NEED TO STORE THE VARIABLES IN A SESSION FIRST TO PASS BACK AND FORTH'''
 @app.route("/delete_skill_from_db", methods=["GET", "POST"])
 def delete_skill_from_db():
     user_recommended_delete = request.form['UserRecommendedDelete']

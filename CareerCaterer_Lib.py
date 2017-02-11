@@ -8,47 +8,29 @@ from pdfminer.pdfparser import PDFParser, PDFDocument
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import PDFPageAggregator
 from pdfminer.layout import LAParams, LTTextBox, LTTextLine
-import pandas as pd
 from functools import reduce
 import re
-
 from bs4 import BeautifulSoup # For HTML parsing
 import urllib # Website connections
-import re # Regular expressions
 from time import sleep # To prevent overwhelming the server between connections
 from collections import Counter # Keep track of our term counts
 from nltk.corpus import stopwords # Filter out stopwords, such as 'the', 'or', 'and'
-import pandas as pd # For converting results to a dataframe and bar chart plots
 import math
 from string import digits
 from orangecontrib.associate.fpgrowth import *  
 import Orange
 import numpy as np
 from scipy.sparse import lil_matrix
-import pymysql as mdb
-import ast
-from gensim import corpora, models, similarities
-
-import pymysql as mdb
 import sys
-from bs4 import BeautifulSoup # For HTML parsing
-import urllib # Website connections
-import re # Regular expressions
-from time import sleep # To prevent overwhelming the server between connections
-from collections import Counter # Keep track of our term counts
-from nltk.corpus import stopwords # Filter out stopwords, such as 'the', 'or', 'and'
-import pandas as pd # For converting results to a dataframe and bar chart plots
-import math
-from string import digits
-from functools import reduce
 import time
 import collections
 from http.cookiejar import CookieJar
 import ssl
-
 import socket
 from time import sleep
-socket.setdefaulttimeout(60) #if it takes longer than a minute to connect to webpage, move on
+
+#if it takes longer than a minute to connect to webpage, move on
+socket.setdefaulttimeout(60) 
 
 
 #Function to scrape job listings from indeed.  Used in ScrapeJobListings
